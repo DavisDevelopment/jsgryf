@@ -1,0 +1,158 @@
+package gryffin.core;
+
+import tannus.io.Signal;
+import tannus.ds.Destructible;
+import tannus.events.MouseEvent;
+import tannus.geom.*;
+
+import tannus.nore.Selector;
+
+import gryffin.events.*;
+import gryffin.display.Ctx;
+import gryffin.core.Entity;
+import gryffin.core.EventDispatcher;
+
+import js.html.CanvasElement in Canvas;
+
+using Lambda;
+using tannus.ds.ArrayTools;
+
+class Stage extends EventDispatcher {
+	/* Constructor Function */
+	public function new(can : Canvas):Void {
+		super();
+
+		canvas = can;
+		ctx = canvas.getContext2d();
+		children = new Array();
+		manager = new FrameManager();
+		mouseManager = new MouseListener( this );
+
+		__init();
+	}
+
+/* === Instance Methods === */
+
+	/**
+	  * Resize [this] Stage
+	  */
+	public function resize(w:Int, h:Int):Void {
+		canvas.width = w;
+		canvas.height = h;
+		ctx = canvas.getContext2d();
+	}
+
+	/**
+	  * Append some Entity to [this] Stage
+	  */
+	public function addChild(child : Entity):Void {
+		if (!children.has( child )) {
+			children.push( child );
+			child.dispatch('activated', this);
+			child.stage = this;
+		}
+	}
+
+	/**
+	  * Function run each frame
+	  */
+	private function frame(delta : Float):Void {
+		/* remove those Entities which have been marked for deletion */
+		children = children.filter(function(e) return !e.destroyed);
+
+		/* sort the Entities by priority */
+		haxe.ds.ArraySort.sort(children, function(a:Entity, b:Entity) {
+			return (b.priority - a.priority);
+		});
+
+		/* clear the Canvas */
+		ctx.erase();
+
+		/* for every Entity on [this] Stage */
+		for (child in children) {
+			// if it not cached
+			if (!child._cached) {
+				// update it
+				child.update( this );
+			}
+
+			// if it is not hidden
+			if (!child._hidden) {
+				// render it
+				child.render(this, ctx);
+			}
+		}
+	}
+
+	/**
+	  * Query [this] Stage
+	  */
+	public function get<T:Entity>(sel : String):Array<T> {
+		var s:Selector<T> = new Selector(sel);
+		return s.filter(untyped children);
+	}
+
+	/**
+	  * Handle a MouseEvent
+	  */
+	private function mouseEvent(e : MouseEvent):Void {
+		dispatch(e.type, e);
+		for (child in children) {
+			if (child.containsPoint(e.position)) {
+				child.dispatch(e.type, e);
+			}
+		}
+	}
+
+	/**
+	  * Initialize [this] Stage
+	  */
+	private function __init():Void {
+		__events();
+	}
+
+	/**
+	  * Initialize all Event Managing Objects
+	  */
+	private function __events():Void {
+		manager.frame.on( frame );
+		manager.start();
+	}
+
+/* === Computed Instance Fields === */
+
+	/* the width of [this] Stage */
+	public var width(get, set):Int;
+	private inline function get_width() return canvas.width;
+	private function set_width(v : Int):Int {
+		resize(v, height);
+		return width;
+	}
+
+	/* the height of [this] Stage */
+	public var height(get, set):Int;
+	private inline function get_height() return canvas.height;
+	private function set_height(v : Int):Int {
+		resize(width, v);
+		return height;
+	}
+
+	/* the rectangle of [this] Stage */
+	public var rect(get, set):Rectangle;
+	private inline function get_rect():Rectangle {
+		return new Rectangle(0, 0, width, height);
+	}
+	private inline function set_rect(v : Rectangle):Rectangle {
+		resize(Math.round(v.w), Math.round(v.h));
+		return rect;
+	}
+
+/* === Instance Fields === */
+
+	public var canvas : Canvas;
+	public var ctx : Ctx;
+	public var children : Array<Entity>;
+
+	private var manager : FrameManager;
+	private var mouseManager : MouseListener;
+}
