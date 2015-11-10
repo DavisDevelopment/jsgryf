@@ -76,8 +76,8 @@ class Stage extends EventDispatcher {
 		if ( _fill ) {
 			var vp = window.viewport;
 			if (vp != lastWindowSize) {
-				canvas.width = Std.int( vp.w );
-				canvas.height = Std.int( vp.h );
+				canvas.width = (Std.int( vp.w ));
+				canvas.height = (Std.int( vp.h ));
 				lastWindowSize = vp;
 			}
 		}
