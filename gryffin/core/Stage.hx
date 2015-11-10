@@ -4,6 +4,7 @@ import tannus.io.Signal;
 import tannus.ds.Destructible;
 import tannus.events.MouseEvent;
 import tannus.geom.*;
+import tannus.html.Win;
 
 import tannus.nore.Selector;
 
@@ -28,6 +29,9 @@ class Stage extends EventDispatcher {
 		manager = new FrameManager();
 		mouseManager = new MouseListener( this );
 
+		_fill = false;
+		lastWindowSize = window.viewport;
+
 		__init();
 	}
 
@@ -48,15 +52,36 @@ class Stage extends EventDispatcher {
 	public function addChild(child : Entity):Void {
 		if (!children.has( child )) {
 			children.push( child );
-			child.dispatch('activated', this);
 			child.stage = this;
+			child.dispatch('activated', this);
 		}
+	}
+
+	/**
+	  * Cause the Canvas to scale to fit the Window
+	  */
+	public function fill():Void {
+		_fill = true;
 	}
 
 	/**
 	  * Function run each frame
 	  */
 	private function frame(delta : Float):Void {
+		/*
+		   if the [_fill] attribute is `true`, 
+		   and the size of the Window has changed,
+		   scale the Canvas to fit the Window
+		*/
+		if ( _fill ) {
+			var vp = window.viewport;
+			if (vp != lastWindowSize) {
+				canvas.width = Std.int( vp.w );
+				canvas.height = Std.int( vp.h );
+				lastWindowSize = vp;
+			}
+		}
+
 		/* remove those Entities which have been marked for deletion */
 		children = children.filter(function(e) return !e.destroyed);
 
@@ -155,4 +180,20 @@ class Stage extends EventDispatcher {
 
 	private var manager : FrameManager;
 	private var mouseManager : MouseListener;
+
+	/* dictates whether or not to scale the Canvas to fit the window */
+	private var _fill : Bool;
+	
+	/* the last known dimensions of the Window */
+	private var lastWindowSize : Rectangle;
+
+/* === Static Fields === */
+
+	/**
+	  * The current Window object
+	  */
+	private static var window(get, never):Win;
+	private static inline function get_window():Win {
+		return Win.current;
+	}
 }
