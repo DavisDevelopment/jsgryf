@@ -119,10 +119,23 @@ class Image implements Paintable {
 	  * Create a new Image with the given source
 	  */
 	public static function load(src:String, ?cb:Image->Void):Image {
-		var img:Image = new Image();
-		img.src = src;
-		if (cb != null)
-			img.ready.once(cb.bind(img));
-		return img;
+		if (!registry.exists( src )) {
+			var img:Image = new Image();
+			img.src = src;
+			if (cb != null)
+				img.ready.once(cb.bind(img));
+			registry[src] = img;
+			return img;
+		}
+		else {
+			var img:Image = registry.get( src );
+			if (cb != null) {
+				(img.complete ? defer : img.ready.once)(cb.bind( img ));
+			}
+			return img;
+		}
 	}
+
+	/* registry of all Images which have been loaded so far */
+	private static var registry:Map<String, Image> = {new Map();};
 }
