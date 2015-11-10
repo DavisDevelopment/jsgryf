@@ -1,6 +1,12 @@
 package gryffin.display;
 
+import tannus.geom.*;
+
+import gryffin.display.Paintable;
+
 import js.html.CanvasRenderingContext2D in Context;
+
+using gryffin.display.CtxTools;
 
 @:forward
 abstract Ctx (Context) from Context to Context {
@@ -16,6 +22,34 @@ abstract Ctx (Context) from Context to Context {
 	  */
 	public inline function erase():Void {
 		this.clearRect(0, 0, width, height);
+	}
+
+	/**
+	  * Paint some object onto [this] Context
+	  */
+	public inline function paint(comp:Paintable, src:Rectangle, dest:Rectangle):Void {
+		comp.paint(this, src, dest);
+	}
+
+	/**
+	  * Draw a Paintable object
+	  */
+	public inline function drawComponent(comp:Paintable, sx:Float, sy:Float, sw:Float, sh:Float, dx:Float, dy:Float, dw:Float, dh:Float):Void {
+		paint(comp, new Rectangle(sx, sy, sw, sh), new Rectangle(dx, dy, dw, dh));
+	}
+
+	/**
+	  * Apply the given Matrix
+	  */
+	public inline function setMatrix(m : Matrix):Void {
+		this.applyMatrix( m );
+	}
+
+	/**
+	  * Get the current Matrix
+	  */
+	public inline function getMatrix():Matrix {
+		return this.obtainMatrix();
 	}
 
 /* === Instance Fields === */
