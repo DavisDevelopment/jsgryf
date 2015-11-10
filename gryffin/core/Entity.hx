@@ -17,7 +17,7 @@ class Entity extends EventDispatcher {
 		destroyed = false;
 		priority = 0;
 
-		once('activate', init);
+		once('activated', init);
 	}
 
 /* === Instance Methods === */
