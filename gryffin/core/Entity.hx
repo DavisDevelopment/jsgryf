@@ -103,6 +103,7 @@ class Entity extends EventDispatcher {
 
 	public var _cached : Bool;
 	public var _hidden : Bool;
+	
 	public var destroyed : Bool;
 	public var priority : Int;
 	public var stage : Stage;
