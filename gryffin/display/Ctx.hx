@@ -39,6 +39,13 @@ abstract Ctx (Context) from Context to Context {
 	}
 
 	/**
+	  * CanvasRenderingContext2D::measureText patched to also measure height
+	  */
+	public inline function measureText(txt : String):TextMetrics {
+		return this.patchedMeasureText( txt );
+	}
+
+	/**
 	  * Apply the given Matrix
 	  */
 	public inline function setMatrix(m : Matrix):Void {
@@ -60,3 +67,8 @@ abstract Ctx (Context) from Context to Context {
 	public var height(get, never):Int;
 	private inline function get_height() return this.canvas.height;
 }
+
+typedef TextMetrics = {
+	width : Float,
+	height : Float
+};
