@@ -31,6 +31,7 @@ class Video implements Paintable {
 		oncanplay = new VSignal();
 		onplay = new VSignal();
 		onpause = new VSignal();
+		onload = new VSignal();
 
 		listen();
 	}
@@ -66,6 +67,22 @@ class Video implements Paintable {
 	}
 
 	/**
+	  * Loads the given Url, and alerts the caller when complete
+	  */
+	public function load(url:Url, cb:Void->Void):Void {
+		pause();
+
+		onload.once(function() trace('VIDEO LOADED'));
+		oncanplay.once( cb );
+		onerror.once(function(error : Dynamic):Void {
+			js.Browser.console.error( error );
+			cb();
+		});
+		
+		src = url;
+	}
+
+	/**
 	  * Bind the Signal fields of [this] Video to the underlying events
 	  */
 	private function listen():Void {
@@ -76,6 +93,7 @@ class Video implements Paintable {
 		on('canplay', oncanplay.fire);
 		on('play', onplay.fire);
 		on('pause', onpause.fire);
+		on('load', onload.fire);
 
 		durationChanged();
 		volumeChanged();
@@ -166,6 +184,7 @@ class Video implements Paintable {
 	private var vid : Vid;
 
 	/* == media-event Signals == */
+	public var onload : VSignal;
 	public var onerror : Signal<MediaError>;
 	public var onended : VSignal;
 	public var oncanplay : VSignal;
