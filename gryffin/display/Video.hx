@@ -69,7 +69,7 @@ class Video implements Paintable {
 	/**
 	  * Loads the given Url, and alerts the caller when complete
 	  */
-	public function load(url:Url, cb:Void->Void):Void {
+	public function load(url:String, cb:Void->Void):Void {
 		pause();
 
 		onload.once(function() trace('VIDEO LOADED'));
@@ -140,11 +140,11 @@ class Video implements Paintable {
 	}
 
 	/* the [src] attribute of [this] Video */
-	public var src(get, set):Url;
-	private function get_src():Url {
-		return new Url( vid.currentSrc );
+	public var src(get, set):String;
+	private function get_src():String {
+		return Std.string(vid.currentSrc);
 	}
-	private function set_src(v : Url):Url {
+	private function set_src(v : String):String {
 		vid.src = v.toString();
 		return src;
 	}
@@ -177,6 +177,11 @@ class Video implements Paintable {
 	public var volume(get, set):Float;
 	private inline function get_volume() return vid.volume;
 	private inline function set_volume(v : Float):Float return (vid.volume = v);
+
+	/* whether [this] Video is currently muted */
+	public var muted(get, set):Bool;
+	private inline function get_muted() return vid.muted;
+	private inline function set_muted(v : Bool) return (vid.muted = v);
 
 /* === Instance Fields === */
 
