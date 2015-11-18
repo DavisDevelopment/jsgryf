@@ -3,6 +3,7 @@ package gryffin.core;
 import tannus.io.Signal;
 import tannus.ds.Destructible;
 import tannus.events.MouseEvent;
+import tannus.events.KeyboardEvent;
 import tannus.geom.*;
 import tannus.html.Win;
 
@@ -28,6 +29,9 @@ class Stage extends EventDispatcher {
 		children = new Array();
 		manager = new FrameManager();
 		mouseManager = new MouseListener( this );
+		keyManager = new KeyListener( this );
+		mouseWatcher = new MouseWatcher( this );
+		eventTimes = new Map();
 
 		_fill = false;
 		lastWindowSize = window.viewport;
@@ -65,6 +69,20 @@ class Stage extends EventDispatcher {
 	}
 
 	/**
+	  * Get the last known position of the cursor
+	  */
+	public function getMousePosition():Point {
+		return mouseWatcher.getMousePosition();
+	}
+
+	/**
+	  * Get the time of the most recent occurrence of the given event
+	  */
+	public function mostRecentOccurrenceTime(event : String):Null<Float> {
+		return eventTimes.get( event );
+	}
+
+	/**
 	  * Function run each frame
 	  */
 	private function frame(delta : Float):Void {
@@ -76,6 +94,7 @@ class Stage extends EventDispatcher {
 		if ( _fill ) {
 			var vp = window.viewport;
 			if (vp != lastWindowSize) {
+				StageFiller.sheet();
 				canvas.width = (Std.int( vp.w ));
 				canvas.height = (Std.int( vp.h ));
 				lastWindowSize = vp;
@@ -122,11 +141,21 @@ class Stage extends EventDispatcher {
 	  */
 	private function mouseEvent(e : MouseEvent):Void {
 		dispatch(e.type, e);
+
+		/* reverse [children] so that the topmost Entity will become the target */
+		children.reverse();
+		
+		/* find the target */
+		var target:Null<Entity> = null;
 		for (child in children) {
 			if (child.containsPoint(e.position)) {
 				child.dispatch(e.type, e);
+				target = child;
+				break;
 			}
 		}
+		/* reverse [children] again so that it's back in its original order */
+		children.reverse();
 	}
 
 	/**
@@ -142,6 +171,14 @@ class Stage extends EventDispatcher {
 	private function __events():Void {
 		manager.frame.on( frame );
 		manager.start();
+	}
+
+	/**
+	  * Store the times at which events occur
+	  */
+	override public function dispatch<T>(name:String, data:T):Void {
+		super.dispatch(name, data);
+		eventTimes.set(name, Date.now().getTime());
 	}
 
 /* === Computed Instance Fields === */
@@ -180,12 +217,15 @@ class Stage extends EventDispatcher {
 
 	private var manager : FrameManager;
 	private var mouseManager : MouseListener;
+	private var keyManager : KeyListener;
+	private var mouseWatcher : MouseWatcher;
 
 	/* dictates whether or not to scale the Canvas to fit the window */
 	private var _fill : Bool;
 	
 	/* the last known dimensions of the Window */
 	private var lastWindowSize : Rectangle;
+	private var eventTimes : Map<String, Float>;
 
 /* === Static Fields === */
 
