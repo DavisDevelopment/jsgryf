@@ -27,7 +27,7 @@ class MouseListener implements EventCreator {
 	  * Listen for events on the thing
 	  */
 	private function bind():Void {
-		var relevant = ['click', 'mouseup', 'mousedown'];
+		var relevant = ['click', 'mouseup', 'mousedown', 'mouseenter', 'mouseleave'];
 		for (name in relevant) {
 			canvas.addEventListener(name, handle);
 		}
@@ -90,15 +90,15 @@ class MouseListener implements EventCreator {
 			var target = getRootTarget( event );
 			switch ([lastTarget, target]) {
 				/* == mouseenter == */
-				case [null, entered]:
+				case [null, entered] if (entered != null):
 					entered.dispatch('mouseenter', e);
 
 				/* == mouseleave == */
-				case [left, null]:
+				case [left, null] if (left != null):
 					left.dispatch('mouseleave', e);
 
 				/* == mousemove == */
-				case [left, right]:
+				case [left, right] if (left != null && right != null):
 					/* == moved within the same entity == */
 					if (left == right) {
 						left.dispatch('mousemove', e);
