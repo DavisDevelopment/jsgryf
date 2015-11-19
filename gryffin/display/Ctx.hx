@@ -39,6 +39,13 @@ abstract Ctx (Context) from Context to Context {
 	}
 
 	/**
+	  * Draw a vertex array
+	  */
+	public inline function drawVertices(vertices:Vertices, ?closed:Bool):Void {
+		this.drawVertices(vertices, closed);
+	}
+
+	/**
 	  * CanvasRenderingContext2D::measureText patched to also measure height
 	  */
 	public inline function measureText(txt : String):TextMetrics {
