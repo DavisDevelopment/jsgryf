@@ -3,6 +3,7 @@ package gryffin.events;
 import gryffin.core.*;
 
 import tannus.events.MouseEvent;
+import tannus.events.ScrollEvent;
 import tannus.events.EventCreator;
 import tannus.events.EventMod;
 import tannus.html.Win;
@@ -10,6 +11,7 @@ import tannus.geom.Point;
 
 import js.html.CanvasElement in Canvas;
 import js.html.MouseEvent in JMEvent;
+import js.html.WheelEvent in JWEvent;
 
 @:access(gryffin.core.Stage)
 class MouseListener implements EventCreator {
@@ -26,12 +28,27 @@ class MouseListener implements EventCreator {
 	/**
 	  * Listen for events on the thing
 	  */
-	private function bind():Void {
+	private function bindMouse():Void {
 		var relevant = ['click', 'mouseup', 'mousedown', 'mouseenter', 'mouseleave'];
 		for (name in relevant) {
 			canvas.addEventListener(name, handle);
 		}
 		canvas.addEventListener('mousemove', handleMove);
+	}
+
+	/**
+	  * Listen for mouse-wheel events
+	  */
+	private function bindWheel():Void {
+		canvas.addEventListener('mousewheel', handleWheel);
+	}
+
+	/**
+	  * Listen for events
+	  */
+	private function bind():Void {
+		bindMouse();
+		bindWheel();
 	}
 
 	/**
@@ -126,6 +143,15 @@ class MouseListener implements EventCreator {
 			}
 		}
 		return null;
+	}
+
+	/**
+	  * Handle mouse wheen events
+	  */
+	private function handleWheel(e : JWEvent):Void {
+		var delta:Int = Std.int(Math.max(-1, Math.min(1, -e.deltaY)));
+		var event:ScrollEvent = new ScrollEvent( delta );
+		stage.dispatch('scroll', event);
 	}
 
 /* === Instance Fields === */
