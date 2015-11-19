@@ -106,7 +106,7 @@ class Stage extends EventDispatcher {
 
 		/* sort the Entities by priority */
 		haxe.ds.ArraySort.sort(children, function(a:Entity, b:Entity) {
-			return (b.priority + a.priority);
+			return (a.priority - b.priority);
 		});
 
 		/* clear the Canvas */
