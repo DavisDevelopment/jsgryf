@@ -26,6 +26,7 @@ class Video implements Paintable {
 		ondurationchange = new Signal();
 		onvolumechange = new Signal();
 		onratechange = new Signal();
+		onstatechange = new Signal();
 
 		onended = new VSignal();
 		oncanplay = new VSignal();
@@ -83,6 +84,24 @@ class Video implements Paintable {
 	}
 
 	/**
+	  * Get a copy of the current state of [this] Video
+	  */
+	public function getState():VideoState {
+		return {
+			'volume': volume,
+			'speed': playbackRate
+		};
+	}
+
+	/**
+	  * Set the current state of [this] Video
+	  */
+	public function setState(state : VideoState):Void {
+		volume = state.volume;
+		playbackRate = state.speed;
+	}
+
+	/**
 	  * Bind the Signal fields of [this] Video to the underlying events
 	  */
 	private function listen():Void {
@@ -97,7 +116,7 @@ class Video implements Paintable {
 
 		durationChanged();
 		volumeChanged();
-		//rateChanged();
+		rateChanged();
 	}
 
 	/* listen to the 'durationchange' Event */
@@ -119,7 +138,19 @@ class Video implements Paintable {
 		vid.addEventListener('volumechange', function() {
 			var delta = new Delta(volume, last_vol);
 			onvolumechange.call( delta );
+			onstatechange.call(getState());
 			last_vol = volume;
+		});
+	}
+
+	/* listen for the 'ratechange' Event */
+	private function rateChanged():Void {
+		var last_rate:Null<Float> = playbackRate;
+		vid.addEventListener('ratechange', function() {
+			var delta = new Delta(playbackRate, last_rate);
+			onratechange.call( delta );
+			onstatechange.call(getState());
+			last_rate = playbackRate;
 		});
 	}
 
@@ -199,6 +230,7 @@ class Video implements Paintable {
 	public var ondurationchange : Signal<Delta<Duration>>;
 	public var onvolumechange : Signal<Delta<Float>>;
 	public var onratechange : Signal<Delta<Float>>;
+	public var onstatechange : Signal<VideoState>;
 
 /* === Static Methods === */
 
@@ -209,3 +241,8 @@ class Video implements Paintable {
 		return js.Browser.document.createVideoElement();
 	}
 }
+
+typedef VideoState = {
+	volume : Float,
+	speed : Float
+};
