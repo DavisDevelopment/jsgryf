@@ -7,6 +7,10 @@ import gryffin.display.Ctx;
 import gryffin.core.Stage;
 import gryffin.core.EventDispatcher;
 
+import gryffin.fx.Effect;
+import gryffin.fx.Animanager;
+import gryffin.fx.Animation;
+
 class Entity extends EventDispatcher {
 	/* Constructor Function */
 	public function new():Void {
@@ -16,6 +20,10 @@ class Entity extends EventDispatcher {
 		_hidden = false;
 		destroyed = false;
 		priority = 0;
+		effects = new Array();
+
+		/* attach and activate the Animation manager */
+		addEffect(animanager = new Animanager());
 
 		once('activated', init);
 	}
@@ -82,7 +90,11 @@ class Entity extends EventDispatcher {
 	  * Update the state of [this] Entity
 	  */
 	public function update(s : Stage):Void {
-		null;
+		for (e in effects) {
+			if (e.active( this )) {
+				e.affect( this );
+			}
+		}
 	}
 
 	/**
@@ -99,12 +111,36 @@ class Entity extends EventDispatcher {
 		return false;
 	}
 
+	/**
+	  * Add an Effect to [this] Entity
+	  */
+	public function addEffect(e : Effect<Dynamic>):Void {
+		effects.push( e );
+	}
+
+	/**
+	  * Add an Animation to [this] Entity
+	  */
+	public function addAnimation(a : Animation):Void {
+		animanager.addAnimation( a );
+	}
+
+	/**
+	  * Remove an Effect from [this] Entity
+	  */
+	public function removeEffect(e : Effect<Dynamic>):Void {
+		effects.remove( e );
+	}
+
 /* === Instance Fields === */
 
 	public var _cached : Bool;
 	public var _hidden : Bool;
+	public var effects : Array<Effect<Dynamic>>;
 	
 	public var destroyed : Bool;
 	public var priority : Int;
 	public var stage : Stage;
+
+	private var animanager : Animanager<Entity>;
 }
