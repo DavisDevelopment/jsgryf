@@ -13,6 +13,7 @@ import gryffin.events.*;
 import gryffin.display.Ctx;
 import gryffin.core.Entity;
 import gryffin.core.EventDispatcher;
+import gryffin.fx.Animations;
 
 import js.html.CanvasElement in Canvas;
 
@@ -126,6 +127,32 @@ class Stage extends EventDispatcher {
 				child.render(this, ctx);
 			}
 		}
+
+		/* if we're managing Animations */
+		if ( Animations.manager == this ) {
+			Animations.tick();
+		}
+	}
+
+	/**
+	  * Walk [children], getting child-nodes of Containers as well
+	  */
+	private function walk(?childList:Array<Entity>, ?ignore:Entity->Bool):Array<Entity> {
+		if (childList == null)
+			childList = children;
+		var results:Array<Entity> = childList;
+		
+		for (child in childList) {
+			if (ignore != null && ignore(child)) {
+				continue;
+			}
+			if (Std.is(child, EntityContainer)) {
+				var container:EntityContainer = cast child;
+				results = results.concat(walk( container.children ));
+			}
+		}
+
+		return results;
 	}
 
 	/**
@@ -133,7 +160,7 @@ class Stage extends EventDispatcher {
 	  */
 	public function get<T:Entity>(sel : String):Array<T> {
 		var s:Selector<T> = new Selector(sel);
-		return s.filter(untyped children);
+		return s.filter(untyped walk());
 	}
 
 	/**
@@ -142,20 +169,24 @@ class Stage extends EventDispatcher {
 	private function mouseEvent(e : MouseEvent):Void {
 		dispatch(e.type, e);
 
+		/* ignore items that are cached or hidden */
+		var ignore = (function(e:Entity) return (e._cached || e._hidden));
+
+		/* pre-fetch the list of Entities to be processed */
+		var ents = walk(null, ignore);
+
 		/* reverse [children] so that the topmost Entity will become the target */
-		children.reverse();
-		
+		ents.reverse();
+
 		/* find the target */
 		var target:Null<Entity> = null;
-		for (child in children) {
+		for (child in ents) {
 			if (child.containsPoint(e.position)) {
 				child.dispatch(e.type, e);
 				target = child;
 				break;
 			}
 		}
-		/* reverse [children] again so that it's back in its original order */
-		children.reverse();
 	}
 
 	/**
@@ -163,6 +194,7 @@ class Stage extends EventDispatcher {
 	  */
 	private function __init():Void {
 		__events();
+		Animations.claim( this );
 	}
 
 	/**
