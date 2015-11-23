@@ -40,6 +40,46 @@ class TextBox implements Paintable {
 	}
 
 	/**
+	  * Automatically scale the font-size to the maximum that still 
+	  * draws text inside the given boundaries
+	  */
+	public function autoScale(?mw:Float, ?mh:Float):Void {
+		/* if neither [mw] nor [mh] are provided, do nothing */
+		if (mw == null && mh == null) {
+			return ;
+		}
+		else {
+			fontSize = 1;
+
+			while ( true ) {
+				measure();
+				
+				/* if the max-width was provided, and has been exceeded */
+				if (mw != null && width > mw) {
+					break;
+				}
+
+				/* if the max-height was provided, and has been exceeded */
+				if (mh != null && height > mh) {
+					break;
+				}
+
+				/* if neither boundary has been exceeded, increase [fontSize] by one */
+				fontSize += 1;
+			}
+
+			/*
+			   if the loop has terminated, then the last
+			   time [fontSize] was incremented, it 
+			   exceeded one or more of the boundaries,
+			   so we'll just decrement [fontSize] by one,
+			   and that's the result
+			*/
+			fontSize -= 1;
+		}
+	}
+
+	/**
 	  * Draw [this] TextBox to a Canvas
 	  */
 	private function toCanvas():Canvas {
