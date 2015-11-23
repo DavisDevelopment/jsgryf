@@ -2,14 +2,14 @@ package gryffin.core;
 
 import tannus.geom.Point;
 import tannus.internal.TypeTools.typename;
+import tannus.io.Ptr;
+import tannus.ds.Object;
 
 import gryffin.display.Ctx;
 import gryffin.core.Stage;
 import gryffin.core.EventDispatcher;
 
-import gryffin.fx.Effect;
-import gryffin.fx.Animanager;
-import gryffin.fx.Animation;
+import gryffin.fx.*;
 
 class Entity extends EventDispatcher {
 	/* Constructor Function */
@@ -19,11 +19,9 @@ class Entity extends EventDispatcher {
 		_cached = false;
 		_hidden = false;
 		destroyed = false;
+		parent = null;
 		priority = 0;
 		effects = new Array();
-
-		/* attach and activate the Animation manager */
-		addEffect(animanager = new Animanager());
 
 		once('activated', init);
 	}
@@ -105,6 +103,25 @@ class Entity extends EventDispatcher {
 	}
 
 	/**
+	  * Add [sibling] as a child of [this]'s parent
+	  */
+	public function addSibling(sibling : Entity):Void {
+		if (stage == null) {
+			on('activated', function(s) {
+				addSibling( sibling );
+			});
+		}
+		else {
+			if (parent != null) {
+				parent.addChild( sibling );
+			}
+			else {
+				stage.addChild( sibling );
+			}
+		}
+	}
+
+	/**
 	  * Check whether [this] Entity 'contains' the given Point
 	  */
 	public function containsPoint(p : Point):Bool {
@@ -116,13 +133,6 @@ class Entity extends EventDispatcher {
 	  */
 	public function addEffect(e : Effect<Dynamic>):Void {
 		effects.push( e );
-	}
-
-	/**
-	  * Add an Animation to [this] Entity
-	  */
-	public function addAnimation(a : Animation):Void {
-		animanager.addAnimation( a );
 	}
 
 	/**
@@ -141,6 +151,5 @@ class Entity extends EventDispatcher {
 	public var destroyed : Bool;
 	public var priority : Int;
 	public var stage : Stage;
-
-	private var animanager : Animanager<Entity>;
+	public var parent : Null<EntityContainer>;
 }
