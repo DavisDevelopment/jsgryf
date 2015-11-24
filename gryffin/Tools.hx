@@ -20,10 +20,17 @@ using tannus.ds.ArrayTools;
   */
 class Tools {
 	/**
+	  * Wait [ms] milliseconds, then invoke [action]
+	  */
+	public static inline function wait(ms:Int, action:Void->Void):Void {
+		win.setTimeout(action, ms);
+	}
+
+	/**
 	  * Delay the invokation of the given Function till the end of the current Stack
 	  */
 	public static inline function defer(f : Void->Void):Void {
-		win.setTimeout(f, 5);
+		wait(5, f);
 	}
 
 	/**
