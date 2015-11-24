@@ -4,6 +4,7 @@ import tannus.geom.Point;
 import tannus.internal.TypeTools.typename;
 import tannus.io.Ptr;
 import tannus.ds.Object;
+import tannus.nore.Selector;
 
 import gryffin.display.Ctx;
 import gryffin.core.Stage;
@@ -126,6 +127,14 @@ class Entity extends EventDispatcher {
 	  */
 	public function containsPoint(p : Point):Bool {
 		return false;
+	}
+
+	/**
+	  * Perform ORegEx validation on [this] Entity
+	  */
+	public function is(selector : String):Bool {
+		var sel:Selector<Entity> = new Selector(selector);
+		return sel.test( this );
 	}
 
 	/**
