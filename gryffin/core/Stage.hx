@@ -159,8 +159,14 @@ class Stage extends EventDispatcher {
 	  * Query [this] Stage
 	  */
 	public function get<T:Entity>(sel : String):Array<T> {
-		var s:Selector<T> = new Selector(sel);
-		return s.filter(untyped walk());
+		if (selectorCache.exists( sel )) {
+			return selectorCache.get( sel ).filter(untyped walk());
+		}
+		else {
+			var s:Selector = new Selector( sel );
+			selectorCache.set(sel, s);
+			return s.filter(untyped walk());
+		}
 	}
 
 	/**
@@ -268,4 +274,7 @@ class Stage extends EventDispatcher {
 	private static inline function get_window():Win {
 		return Win.current;
 	}
+
+	/* the cached Selectors */
+	private static var selectorCache:Map<String, Selector> = {new Map();};
 }
