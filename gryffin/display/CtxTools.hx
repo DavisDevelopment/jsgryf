@@ -16,14 +16,16 @@ class CtxTools {
 	/**
 	  * Patched CanvasRenderingContext2D::measureText
 	  */
-	public static function patchedMeasureText(c:Context, txt:String):gryffin.display.Ctx.TextMetrics {
+	public static function patchedMeasureText(c:Context, txt:String):gryffin.display.Context.TextMetrics {
 		var font = c.font;
 		var w = c.measureText( txt ).width;
-		var h = getTextHeight( font ).height;
+		var th = getTextHeight( font );
 		
 		return {
 			'width': w,
-			'height': h
+			'height': th.height,
+			'ascent': th.ascent,
+			'descent': th.descent
 		};
 	}
 
@@ -34,7 +36,7 @@ class CtxTools {
 		var doc = js.Browser.document;
 		
 		var span = doc.createSpanElement();
-		span.style.fontFamily = font;
+		span.style.font = font;
 		span.textContent = 'Hg';
 
 		var block = doc.createDivElement();
