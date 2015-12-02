@@ -34,7 +34,7 @@ class EntityContainer extends Entity {
 	  * Query [this] Container
 	  */
 	public function get<T>(selector : String):Array<T> {
-		var sel:Selector<T> = new Selector( selector );
+		var sel:Selector = new Selector( selector );
 		return sel.filter(untyped children);
 	}
 
