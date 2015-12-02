@@ -79,10 +79,25 @@ class Entity extends EventDispatcher {
 	}
 
 	/**
+	  * Check whether [this] Entity is 'hidden'
+	  */
+	public function isHidden():Bool {
+		return _hidden;
+	}
+
+	/**
+	  * Check whether [this] Entity is 'cached'
+	  */
+	public function isCached():Bool {
+		return _cached;
+	}
+
+	/**
 	  * Initialize [this] Entity
 	  */
 	public function init(s : Stage):Void {
-		trace(typename(this) + ' has been initialized');
+		//trace(typename(this) + ' has been initialized');
+		null;
 	}
 
 	/**
@@ -133,7 +148,7 @@ class Entity extends EventDispatcher {
 	  * Perform ORegEx validation on [this] Entity
 	  */
 	public function is(selector : String):Bool {
-		var sel:Selector<Entity> = new Selector(selector);
+		var sel:Selector = new Selector( selector );
 		return sel.test( this );
 	}
 
