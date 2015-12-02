@@ -4,6 +4,7 @@ import tannus.ds.Ref;
 import tannus.geom.*;
 
 import gryffin.display.Ctx;
+import gryffin.display.Context;
 import gryffin.display.Paintable;
 
 import js.html.CanvasElement in NCanvas;
@@ -16,7 +17,7 @@ class Canvas implements Paintable {
 			canvas = c;
 		else
 			canvas = doc.createCanvasElement();
-		_ctx = new Ref(cast canvas.getContext.bind('2d'));
+		_ctx = Ref.create(new Ctx(canvas.getContext2d()));
 	}
 
 /* === Instance Methods === */
@@ -27,7 +28,7 @@ class Canvas implements Paintable {
 	public function resize(w:Int, h:Int):Void {
 		canvas.width = w;
 		canvas.height = h;
-		_ctx = new Ref(cast canvas.getContext.bind('2d'));
+		_ctx = Ref.create(new Ctx(canvas.getContext2d()));
 	}
 
 	/**
@@ -47,8 +48,8 @@ class Canvas implements Paintable {
 	/**
 	  * Get an Image from [this] Canvas
 	  */
-	public function getImage(cb : Image->Void):Void {
-		Image.load(dataURI(), cb);
+	public function getImage(cb : Image->Void):Image {
+		return Image.load(dataURI(), cb);
 	}
 
 	/**
