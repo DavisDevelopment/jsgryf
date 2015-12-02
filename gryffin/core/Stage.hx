@@ -20,6 +20,7 @@ import js.html.CanvasElement in Canvas;
 using Lambda;
 using tannus.ds.ArrayTools;
 
+@:access( gryffin.display.Canvas )
 class Stage extends EventDispatcher {
 	/* Constructor Function */
 	public function new(can : Canvas):Void {
@@ -101,6 +102,9 @@ class Stage extends EventDispatcher {
 				lastWindowSize = vp;
 			}
 		}
+
+		/* reset the cursor to the default (arrow) */
+		cursor = 'default';
 
 		/* remove those Entities which have been marked for deletion */
 		children = children.filter(function(e) return !e.destroyed);
@@ -245,6 +249,15 @@ class Stage extends EventDispatcher {
 	private inline function set_rect(v : Rectangle):Rectangle {
 		resize(Math.round(v.w), Math.round(v.h));
 		return rect;
+	}
+
+	/* the cursor for [this] Stage */
+	public var cursor(get, set):String;
+	private function get_cursor():String {
+		return canvas.style.cursor;
+	}
+	private function set_cursor(v : String):String {
+		return (canvas.style.cursor = v);
 	}
 
 /* === Instance Fields === */
