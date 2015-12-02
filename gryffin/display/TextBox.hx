@@ -4,6 +4,7 @@ import gryffin.display.Canvas;
 import gryffin.display.Ctx;
 import gryffin.display.Paintable;
 import gryffin.display.TextAlign;
+import gryffin.display.Context.TextMetrics;
 
 import tannus.geom.*;
 import tannus.graphics.Color;
@@ -37,6 +38,14 @@ class TextBox implements Paintable {
 	  */
 	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
 		c.paint(toCanvas(), s, d);
+	}
+
+	/**
+	  * Get the metrics of the given text, with the current settings
+	  */
+	public function getMetrics(s : String):TextMetrics {
+		applyStyles( canvas.context );
+		return canvas.context.measureText( s );
 	}
 
 	/**
@@ -99,7 +108,7 @@ class TextBox implements Paintable {
 
 			/* draw the text to the canvas */
 			applyStyles( canvas.context );
-			canvas.context.fillText(text, padding, padding + textHeight);
+			canvas.context.fillText(text, padding, padding);
 		}
 
 		return canvas;
@@ -112,6 +121,7 @@ class TextBox implements Paintable {
 		c.font = fontString();
 		c.textAlign = align;
 		c.fillStyle = color.toString();
+		c.textBaseline = 'top';
 	}
 
 	/**
@@ -135,7 +145,7 @@ class TextBox implements Paintable {
 		applyStyles( canvas.context );
 		var size = canvas.context.measureText( text );
 		_textWidth = size.width;
-		_textHeight = size.height;
+		_textHeight = (size.height);
 	}
 
 /* === Computed Instance Fields === */
@@ -167,6 +177,8 @@ class TextBox implements Paintable {
 		if (v != _fontFamily) {
 			stateChanged = true;
 		}
+		if (v.has(' '))
+			v = v.wrap('"');
 		return (_fontFamily = v);
 	}
 
