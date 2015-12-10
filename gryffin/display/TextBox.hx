@@ -89,6 +89,32 @@ class TextBox implements Paintable {
 	}
 
 	/**
+	  * Fit [this] text to the given metrics
+	  */
+	public function fit(?w:Float, ?h:Float):Void {
+		if (w == null && h == null) {
+			return ;
+		}
+		else {
+			while ( true ) {
+				measure();
+
+				if (w != null && width > w) {
+					fontSize--;
+				}
+
+				else if (h != null && height > h) {
+					fontSize--;
+				}
+
+				else {
+					break;
+				}
+			}
+		}
+	}
+
+	/**
 	  * Draw [this] TextBox to a Canvas
 	  */
 	private function toCanvas():Canvas {
