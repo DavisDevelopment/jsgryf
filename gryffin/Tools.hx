@@ -29,7 +29,7 @@ class Tools {
 	/**
 	  * Delay the invokation of the given Function till the end of the current Stack
 	  */
-	public static inline function defer(f : Void->Void):Void {
+	public static function defer(f : Void->Void):Void {
 		wait(5, f);
 	}
 
