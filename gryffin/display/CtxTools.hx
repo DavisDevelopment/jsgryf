@@ -107,23 +107,14 @@ class CtxTools {
 	/**
 	  * Draw a Vertex-List
 	  */
-	public static function drawVertices(c:Ctx, vertices:Vertices, closed:Bool=true):Void {
+	public static function drawVertices(c:Ctx, vertices:Vertices):Void {
 		var points:Array<Point> = vertices;
 		var first:Point = points.shift();
-		c.beginPath();
 		c.moveTo(first.x, first.y);
 		for (p in points) {
 			c.lineTo(p.x, p.y);
 		}
 		c.lineTo(first.x, first.y);
-		if (closed) {
-			c.closePath();
-			c.stroke();
-		}
-		else {
-			c.stroke();
-			c.closePath();
-		}
 	}
 
 	/**
