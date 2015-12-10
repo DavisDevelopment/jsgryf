@@ -34,6 +34,20 @@ class MouseListener implements EventCreator {
 			canvas.addEventListener(name, handle);
 		}
 		canvas.addEventListener('mousemove', handleMove);
+
+		canvas.addEventListener('contextmenu', function(e : JMEvent) {
+			var event:MouseEvent = new MouseEvent(e.type, findPos(e), e.button, findMods(e));
+			
+			function prevent():Void {
+				e.preventDefault();
+			}
+			
+			event.onCancelled.once( prevent );
+			event.onDefaultPrevented.once( prevent );
+			event.onPropogationStopped.once( prevent );
+
+			stage.mouseEvent( event );
+		});
 	}
 
 	/**
