@@ -23,4 +23,11 @@ class Effect<T : Entity> {
 	public function affect(e : T):Void {
 		null;
 	}
+
+	/**
+	  * Perform any needed initializations when [this] Effect is attached to the Entity
+	  */
+	public function attach(e : T):Void {
+		null;
+	}
 }
