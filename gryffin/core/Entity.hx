@@ -8,15 +8,17 @@ import tannus.nore.Selector;
 
 import gryffin.display.Ctx;
 import gryffin.core.Stage;
-import gryffin.core.EventDispatcher;
+import gryffin.core.EventDispatcher; import gryffin.fx.*;
+import gryffin.Tools;
 
-import gryffin.fx.*;
+using Lambda;
 
 class Entity extends EventDispatcher {
 	/* Constructor Function */
 	public function new():Void {
 		super();
 
+		id = Tools.makeUniqueIdentifier( 8 );
 		_cached = false;
 		_hidden = false;
 		destroyed = false;
@@ -34,6 +36,7 @@ class Entity extends EventDispatcher {
 	  */
 	public function delete():Void {
 		destroyed = true;
+		Tools.deleteUniqueIdentifier( id );
 	}
 
 	/**
@@ -156,7 +159,10 @@ class Entity extends EventDispatcher {
 	  * Add an Effect to [this] Entity
 	  */
 	public function addEffect(e : Effect<Dynamic>):Void {
-		effects.push( e );
+		if (!effects.has( e )) {
+			e.attach( this );
+			effects.push( e );
+		}
 	}
 
 	/**
@@ -175,5 +181,11 @@ class Entity extends EventDispatcher {
 	public var destroyed : Bool;
 	public var priority : Int;
 	public var stage : Stage;
-	public var parent : Null<EntityContainer>;
+	public var parent(default, set): Null<EntityContainer>;
+	private function set_parent(p : Null<EntityContainer>):Null<EntityContainer> {
+		if (p != null && !Std.is(p, EntityContainer))
+			throw 'Not a container!';
+		return (parent = p);
+	}
+	public var id : String;
 }
