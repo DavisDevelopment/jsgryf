@@ -4,6 +4,7 @@ import gryffin.display.Ctx;
 import gryffin.core.Entity;
 
 import tannus.nore.Selector;
+import tannus.io.Getter;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -24,18 +25,27 @@ class EntityContainer extends Entity {
 	public function addChild(e : Entity):Void {
 		if (!children.has( e )) {
 			children.push( e );
-			e.stage = stage;
 			e.parent = this;
-			e.dispatch('activated', stage);
+			if (stage != null) {
+				stage.registry[e.id] = e;
+				e.stage = stage;
+				e.dispatch('activated', stage);
+			}
+			else {
+				on('activated', function(s : Stage) {
+					s.registry[e.id] = e;
+					e.stage = s;
+					e.dispatch('activated', s);
+				});
+			}
 		}
 	}
 
 	/**
 	  * Query [this] Container
 	  */
-	public function get<T>(selector : String):Array<T> {
-		var sel:Selector = new Selector( selector );
-		return sel.filter(untyped children);
+	public function get<T:Entity>(selector : String):Selection<T> {
+		return new Selection(selector, untyped Getter.create( children ));
 	}
 
 	/**
@@ -45,7 +55,11 @@ class EntityContainer extends Entity {
 		super.update( s );
 
 		/* remove those Entities which have been marked for deletion */
-		children = children.macfilter( !_.destroyed );
+		var filt = children.splitfilter(function(e) return !e.destroyed);
+		for (e in filt.fail) {
+			stage.registry.remove( e.id );
+		}
+		children = filt.pass;
 
 		/* sort the Entities by priority */
 		haxe.ds.ArraySort.sort(children, function(a:Entity, b:Entity) {
