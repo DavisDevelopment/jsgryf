@@ -1,6 +1,7 @@
 package gryffin.core;
 
 import tannus.io.Signal;
+import tannus.io.Getter;
 import tannus.ds.Destructible;
 import tannus.events.MouseEvent;
 import tannus.events.KeyboardEvent;
@@ -19,6 +20,7 @@ import js.html.CanvasElement in Canvas;
 
 using Lambda;
 using tannus.ds.ArrayTools;
+using tannus.math.TMath;
 
 @:access( gryffin.display.Canvas )
 class Stage extends EventDispatcher {
@@ -29,6 +31,7 @@ class Stage extends EventDispatcher {
 		canvas = can;
 		ctx = canvas.getContext2d();
 		children = new Array();
+		registry = new Map();
 		manager = new FrameManager();
 		mouseManager = new MouseListener( this );
 		keyManager = new KeyListener( this );
@@ -58,6 +61,7 @@ class Stage extends EventDispatcher {
 	public function addChild(child : Entity):Void {
 		if (!children.has( child )) {
 			children.push( child );
+			registry[child.id] = child;
 			child.stage = this;
 			child.dispatch('activated', this);
 		}
@@ -85,6 +89,31 @@ class Stage extends EventDispatcher {
 	}
 
 	/**
+	  * Get a list of entities that reported themselves to overlap with the given coords
+	  */
+	public function getEntitiesAtPoint(p : Point):Array<Entity> {
+		var res:Array<Entity> = new Array();
+		for (e in walk()) {
+			if (e.containsPoint( p )) {
+				res.push( e );
+			}
+		}
+		return res;
+	}
+
+	/**
+	  * Get the 'first' Entity which reported itself to overlap with the given Point
+	  */
+	public function getEntityAtPoint(p : Point):Null<Entity> {
+		var all = getEntitiesAtPoint( p );
+		var target = all.largestItem(function(e) return e.priority);
+		return target;
+	}
+	public function getEntityAt(x:Float, y:Float):Null<Entity> {
+		return getEntityAtPoint(new Point(x, y));
+	}
+
+	/**
 	  * Function run each frame
 	  */
 	private function frame(delta : Float):Void {
@@ -107,7 +136,11 @@ class Stage extends EventDispatcher {
 		cursor = 'default';
 
 		/* remove those Entities which have been marked for deletion */
-		children = children.filter(function(e) return !e.destroyed);
+		var filtr = children.splitfilter(function(e) return !e.destroyed);
+		for (ent in filtr.fail) {
+			registry.remove( ent.id );
+		}
+		children = filtr.pass;
 
 		/* sort the Entities by priority */
 		haxe.ds.ArraySort.sort(children, function(a:Entity, b:Entity) {
@@ -162,15 +195,8 @@ class Stage extends EventDispatcher {
 	/**
 	  * Query [this] Stage
 	  */
-	public function get<T:Entity>(sel : String):Array<T> {
-		if (selectorCache.exists( sel )) {
-			return selectorCache.get( sel ).filter(untyped walk());
-		}
-		else {
-			var s:Selector = new Selector( sel );
-			selectorCache.set(sel, s);
-			return s.filter(untyped walk());
-		}
+	public function get<T:Entity>(sel : String):Selection<T> {
+		return new Selection(sel, untyped Getter.create( walk() ));
 	}
 
 	/**
@@ -179,23 +205,9 @@ class Stage extends EventDispatcher {
 	private function mouseEvent(e : MouseEvent):Void {
 		dispatch(e.type, e);
 
-		/* ignore items that are cached or hidden */
-		var ignore = (function(e:Entity) return (e._cached || e._hidden));
-
-		/* pre-fetch the list of Entities to be processed */
-		var ents = walk(null, ignore);
-
-		/* reverse [children] so that the topmost Entity will become the target */
-		ents.reverse();
-
-		/* find the target */
-		var target:Null<Entity> = null;
-		for (child in ents) {
-			if (child.containsPoint(e.position)) {
-				child.dispatch(e.type, e);
-				target = child;
-				break;
-			}
+		var target:Null<Entity> = getEntityAtPoint(e.position);
+		if (target != null && !(target.isHidden()||target.isCached()||target.destroyed)) {
+			target.dispatch(e.type, e);
 		}
 	}
 
@@ -265,6 +277,7 @@ class Stage extends EventDispatcher {
 	public var canvas : Canvas;
 	public var ctx : Ctx;
 	public var children : Array<Entity>;
+	public var registry : Map<String, Entity>;
 
 	private var manager : FrameManager;
 	private var mouseManager : MouseListener;
