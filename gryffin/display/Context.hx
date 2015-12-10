@@ -4,6 +4,7 @@ import js.html.*;
 
 import tannus.geom.*;
 import tannus.ds.Stack;
+import gryffin.display.Pixels;
 
 using gryffin.display.CtxTools;
 
@@ -43,8 +44,8 @@ class Context {
 	/**
 	  * Draw a vertex array
 	  */
-	public function drawVertices(vertices:Vertices, ?closed:Bool):Void {
-		ctx.drawVertices(vertices, closed);
+	public function drawVertices(vertices : Vertices):Void {
+		ctx.drawVertices( vertices );
 	}
 
 	/**
@@ -246,6 +247,14 @@ class Context {
 		return ctx.getImageData(sx, sy, sw, sh);
 	}
 
+	/**
+	  * Get the Pixels in the given area
+	  */
+	public function pixels(x:Float, y:Float, w:Float, h:Float):Pixels {
+		var idata = getImageData(x, y, w, h);
+		var pos = new Point(x, y);
+		return new Pixels(this, pos, idata);
+	}
 
 	public function putImageData(imagedata:ImageData, dx:Float, dy:Float, dirtyX:Float, dirtyY:Float, dirtyWidth:Float, dirtyHeight:Float):Void {
 		ctx.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
@@ -303,10 +312,13 @@ class Context {
 		ctx.moveTo(x + r, y);
 		ctx.lineTo(x + w - r, y);
 		ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+
 		ctx.lineTo(x + w, y + h - r);
 		ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+
 		ctx.lineTo(x + r, y + h);
 		ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+
 		ctx.lineTo(x, y + r);
 		ctx.quadraticCurveTo(x, y, x + r, y);
 	}
