@@ -1,6 +1,7 @@
 package gryffin.display;
 
 import gryffin.core.Stage;
+import gryffin.core.EventDispatcher;
 import gryffin.display.*;
 
 import tannus.geom.*;
@@ -17,9 +18,11 @@ import tannus.http.Url;
 import js.html.VideoElement in Vid;
 import js.html.MediaError;
 
-class Video implements Paintable {
+class Video extends EventDispatcher implements Paintable {
 	/* Constructor Function */
 	public function new(?el : Vid):Void {
+		super();
+
 		vid = (el != null ? el : createVid());
 
 		onerror = new Signal();
@@ -58,6 +61,7 @@ class Video implements Paintable {
 	  */
 	public function play():Void {
 		vid.play();
+		dispatch('play', null);
 	}
 
 	/**
@@ -65,6 +69,7 @@ class Video implements Paintable {
 	  */
 	public function pause():Void {
 		vid.pause();
+		dispatch('pause', null);
 	}
 
 	/**
@@ -139,6 +144,7 @@ class Video implements Paintable {
 			var delta = new Delta(volume, last_vol);
 			onvolumechange.call( delta );
 			onstatechange.call(getState());
+			dispatch('volumechange', delta);
 			last_vol = volume;
 		});
 	}
@@ -150,6 +156,7 @@ class Video implements Paintable {
 			var delta = new Delta(playbackRate, last_rate);
 			onratechange.call( delta );
 			onstatechange.call(getState());
+			dispatch('ratechange', delta);
 			last_rate = playbackRate;
 		});
 	}
