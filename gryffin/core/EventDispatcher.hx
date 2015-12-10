@@ -86,6 +86,21 @@ class EventDispatcher {
 		dispatch(name, data);
 	}
 
+	/**
+	  * Forward [event] to [target]
+	  */
+	public function forward(event:String, target:EventDispatcher):Void {
+		on(event, target.call.bind(event, _));
+	}
+
+	/**
+	  * Forward all [events] to [target]
+	  */
+	public function forwardAll(events:Array<String>, target:EventDispatcher):Void {
+		for (e in events)
+			forward(e, target);
+	}
+
 /* === Instance Fields === */
 
 	private var __sigs : Map<String, Signal<Dynamic>>;
