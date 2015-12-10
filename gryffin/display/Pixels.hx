@@ -11,11 +11,10 @@ import tannus.ds.Maybe;
 
 import Std.int;
 
-@:access(gryffin.display.Canvas)
 class Pixels {
 	/* Constructor Function */
-	public function new(owner:Canvas, position:Point, dat:ImageData):Void {
-		canvas = owner;
+	public function new(owner:Ctx, position:Point, dat:ImageData):Void {
+		c = owner;
 		idata = dat;
 		data = idata.data;
 		pos = position;
@@ -85,15 +84,15 @@ class Pixels {
 	/**
 	  * Write [this] PixelData onto the given Canvas
 	  */
-	public function write(target:Canvas, x:Float, y:Float, sx:Float=0, sy:Float=0, ?sw:Maybe<Float>, ?sh:Maybe<Float>):Void {
-		target.context.putImageData(idata, x, y, sx, sy, (sw || width), (sh || height));
+	public function write(target:Ctx, x:Float, y:Float, sx:Float=0, sy:Float=0, ?sw:Maybe<Float>, ?sh:Maybe<Float>):Void {
+		target.putImageData(idata, x, y, sx, sy, (sw || width), (sh || height));
 	}
 
 	/**
 	  * Save [this] PixelData to the owner-canvas
 	  */
 	public function save():Void {
-		write(canvas, pos.x, pos.y);
+		write(c, pos.x, pos.y);
 	}
 
 /* === Computed Instance Fields === */
@@ -111,6 +110,7 @@ class Pixels {
 
 	private var idata : ImageData;
 	private var data : UArray;
-	private var canvas : Canvas;
+	//private var canvas : Canvas;
+	private var c : Ctx;
 	private var pos : Point;
 }
