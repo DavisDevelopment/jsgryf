@@ -52,15 +52,6 @@ class Canvas implements Paintable {
 		return Image.load(dataURI(), cb);
 	}
 
-	/**
-	  * Get a Pixels object
-	  */
-	public function pixels(x:Float, y:Float, w:Float, h:Float):Pixels {
-		var idata = context.getImageData(x, y, w, h);
-		var pos = new Point(x, y);
-		return new Pixels(this, pos, idata);
-	}
-
 /* === Computed Instance Methods === */
 
 	/* the width of [this] Canvas */
