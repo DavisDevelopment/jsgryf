@@ -7,6 +7,7 @@ import tannus.geom.*;
 import tannus.dom.Element;
 import tannus.math.TMath.*;
 import tannus.graphics.Color;
+import tannus.events.KeyboardEvent;
 
 import gryffin.core.*;
 import gryffin.display.*;
@@ -49,8 +50,6 @@ class TextInput extends Entity {
 		showCursor = false;
 		offset = new Point();
 		cursor = 0;
-
-		listen();
 	}
 
 /* === Instance Methods === */
@@ -69,6 +68,7 @@ class TextInput extends Entity {
 		});
 		doc.body.appendChild( input );
 		addEffect(new CursorBlinker());
+		listen();
 	}
 
 	/**
@@ -85,14 +85,13 @@ class TextInput extends Entity {
 			dispatch('focusout', null);
 		});
 
-		el.on('keydown', function(e) {
-			var code:Int = e.keyCode;
-
-			if (code >= 37 && code <= 40) {
-				defer( updateText );
+		stage.on('keydown', function(e : KeyboardEvent) {
+			if ( _hasFocus ) {
+				if (e.keyCode >= 37 && e.keyCode <= 40) {
+					defer( updateText );
+				}
+				dispatch('keydown', e);
 			}
-
-			dispatch('keydown', e);
 		});
 
 		el.on('input', function(e) {
@@ -120,6 +119,13 @@ class TextInput extends Entity {
 	  */
 	public function focus():Void {
 		input.focus();
+	}
+
+	/**
+	  * Unfocus [this] input
+	  */
+	public function blur():Void {
+		input.blur();
 	}
 
 	/**
