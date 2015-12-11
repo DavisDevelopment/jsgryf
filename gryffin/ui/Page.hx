@@ -19,9 +19,9 @@ class Page extends EntityContainer {
 	  */
 	public function open():Void {
 		if (stage != null) {
-			var pages:Array<Page> = stage.get('~gryffin.ui.Page :isOpen');
+			var pages:Selection<Page> = stage.get('~gryffin.ui.Page:_opened');
 			if (pages.length > 0) {
-				prev_page = pages[0];
+				prev_page = pages.at(0);
 				prev_page.close();
 			}
 
