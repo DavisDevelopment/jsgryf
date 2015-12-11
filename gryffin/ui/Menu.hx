@@ -8,6 +8,7 @@ import tannus.geom.*;
 import tannus.ds.Object;
 import tannus.events.MouseEvent;
 import tannus.graphics.Color;
+import tannus.math.TMath.*;
 
 using Lambda;
 
@@ -19,8 +20,7 @@ class Menu extends Entity {
 		rect = new Rectangle();
 		items = new Array();
 		backgroundColor = '#515147';
-
-		on('click', click);
+		orientation = Portrait;
 	}
 
 /* === Instance Methods === */
@@ -42,7 +42,8 @@ class Menu extends Entity {
 		c.save();
 
 		// draw the background
-		c.fillStyle = backgroundColor.toString();
+		var lg = gradient( c );
+		c.fillStyle = lg;
 		c.fillRect(x, y, w, h);
 
 		// draw the menu-items
@@ -64,9 +65,41 @@ class Menu extends Entity {
 	}
 
 	/**
+	  * Make the gradient used to fill [this] Menu
+	  */
+	private function gradient(c : Ctx):js.html.CanvasGradient {
+		var amount:Float = 8;
+		var start:Color = backgroundColor.lighten(amount - 2);
+		var end:Color = backgroundColor.darken(amount + 1);
+		var lg = c.createLinearGradient(x, y, x, (y+h));
+		lg.addColorStop(0.0, start.toString());
+		lg.addColorStop(1.0, end.toString());
+
+		return lg;
+	}
+
+	/**
+	  * Get all items attached to [this], and their descendents, recursively
+	  */
+	private function walk(?list:Array<MenuItem>):Array<MenuItem> {
+		if (list == null)
+			list = items;
+		var results:Array<MenuItem> = new Array();
+		for (item in list) {
+			results.push( item );
+			results = results.concat(walk(item.items));
+		}
+		return results;
+	}
+
+	/**
 	  * When [this] gets clicked
 	  */
-	private function click(e : MouseEvent):Void {
+	public function itemClicked(item : MenuItem):Void {
+		if ( !item.subMenu ) {
+			for (i in walk())
+				i.showChildren = false;
+		}
 	}
 
 	/**
@@ -74,16 +107,37 @@ class Menu extends Entity {
 	  */
 	public function positionItems(s : Stage):Void {
 		var ix:Float = 10;
+		var iy:Float = 0;
+		var itm:Null<MenuItem> = null;
+		var maxw:Float = 0;
 		for (item in items) {
 			item.update( s );
+			itm = item;
 			if ( !item.enabled )
 				continue;
+			
+			switch (orientation) {
+				case Portrait:
+					ix += item.padding.left;
+					item.x = (x + ix);
+					item.y = (y + ((h - item.h) / 2));
+					maxw = max(item.w, maxw);
+					ix += item.w;
+					ix += item.padding.right;
 
-			ix += item.padding.left;
-			item.x = (x + ix);
-			item.y = (y + ((h - item.h) / 2));
-			ix += item.w;
-			ix += item.padding.right;
+				case Landscape:
+					iy += item.padding.top;
+					item.x = (x + ix + ((w - item.w) / 2));
+					item.y = (y + iy);
+					maxw = max(item.w, maxw);
+					iy += item.h;
+					iy += item.padding.bottom;
+			}
+		}
+
+		if (orientation == Landscape && itm != null) {
+			h = iy;
+			w = maxw;
 		}
 	}
 
@@ -124,4 +178,5 @@ class Menu extends Entity {
 	public var rect : Rectangle;
 	public var items : Array<MenuItem>;
 	public var backgroundColor : Color;
+	public var orientation : Orientation;
 }
