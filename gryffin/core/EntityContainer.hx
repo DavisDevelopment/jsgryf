@@ -42,6 +42,15 @@ class EntityContainer extends Entity {
 	}
 
 	/**
+	  * report [this]'s list of children
+	  * default behavior is to just return [children], but sub-classes can 
+	  * override this
+	  */
+	public function getChildren():Array<Entity> {
+		return children;
+	}
+
+	/**
 	  * Query [this] Container
 	  */
 	public function get<T:Entity>(selector : String):Selection<T> {
