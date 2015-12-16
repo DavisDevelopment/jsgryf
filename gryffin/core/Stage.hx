@@ -91,11 +91,17 @@ class Stage extends EventDispatcher {
 	/**
 	  * Get a list of entities that reported themselves to overlap with the given coords
 	  */
-	public function getEntitiesAtPoint(p : Point):Array<Entity> {
+	public function getEntitiesAtPoint(p:Point, ?list:Array<Entity>):Array<Entity> {
 		var res:Array<Entity> = new Array();
-		for (e in walk()) {
+		if (list == null)
+			list = children;
+		for (e in list) {
 			if (e.containsPoint( p )) {
 				res.push( e );
+				if (Std.is(e, EntityContainer)) {
+					var c:EntityContainer = cast e;
+					res = res.concat(c.getEntitiesAtPoint( p ));
+				}
 			}
 		}
 		return res;
@@ -105,8 +111,19 @@ class Stage extends EventDispatcher {
 	  * Get the 'first' Entity which reported itself to overlap with the given Point
 	  */
 	public function getEntityAtPoint(p : Point):Null<Entity> {
-		var all = getEntitiesAtPoint( p );
-		var target = all.largestItem(function(e) return e.priority);
+		var target:Null<Entity> = null;
+		for (e in children) {
+			if (e.containsPoint( p )) {
+				target = e;
+				if (Std.is(e, EntityContainer)) {
+					var c:EntityContainer = cast e;
+					var etarget:Null<Entity> = c.getEntityAtPoint( p );
+					if (etarget != null)
+						target = etarget;
+				}
+				break;
+			}
+		}
 		return target;
 	}
 	public function getEntityAt(x:Float, y:Float):Null<Entity> {

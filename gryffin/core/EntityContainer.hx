@@ -5,6 +5,7 @@ import gryffin.core.Entity;
 
 import tannus.nore.Selector;
 import tannus.io.Getter;
+import tannus.geom.*;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -54,7 +55,7 @@ class EntityContainer extends Entity {
 	  * Query [this] Container
 	  */
 	public function get<T:Entity>(selector : String):Selection<T> {
-		return new Selection(selector, untyped Getter.create( children ));
+		return new Selection(selector, untyped getChildren);
 	}
 
 	/**
@@ -76,7 +77,7 @@ class EntityContainer extends Entity {
 		});
 
 		/* update [children] */
-		for (e in children) {
+		for (e in getChildren()) {
 			if ( !e._cached )
 				e.update( s );
 		}
@@ -88,10 +89,50 @@ class EntityContainer extends Entity {
 	override public function render(s:Stage, c:Ctx):Void {
 		super.render(s, c);
 
-		for (e in children) {
+		for (e in getChildren()) {
 			if ( !e._hidden )
 				e.render(s, c);
 		}
+	}
+
+	/**
+	  * get an Array of children of [this] which 'contain' [p]
+	  */
+	public function getEntitiesAtPoint(p : Point):Array<Entity> {
+		var res:Array<Entity> = new Array();
+		for (e in getChildren()) {
+			if (e.containsPoint( p )) {
+				res.push( e );
+				if (Std.is(e, EntityContainer)) {
+					var c:EntityContainer = cast e;
+					res = res.concat(c.getEntitiesAtPoint( p ));
+				}
+			}
+		}
+		return res;
+	}
+
+	/**
+	  * get the priority Entity at the given Point
+	  */
+	public function getEntityAtPoint(p : Point):Null<Entity> {
+		var target:Null<Entity> = null;
+		for (e in getChildren()) {
+			if (e.containsPoint( p )) {
+				target = e;
+				if (Std.is(e, EntityContainer)) {
+					var c:EntityContainer = cast e;
+					var etarget:Null<Entity> = c.getEntityAtPoint( p );
+					if (etarget != null)
+						target = etarget;
+				}
+				break;
+			}
+		}
+		return target;
+	}
+	public function getEntityAt(x:Float, y:Float):Null<Entity> {
+		return getEntityAtPoint(new Point(x, y));
 	}
 
 /* === Instance Fields === */
