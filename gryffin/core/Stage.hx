@@ -185,7 +185,7 @@ class Stage extends EventDispatcher {
 			}
 			if (Std.is(child, EntityContainer)) {
 				var container:EntityContainer = cast child;
-				results = results.concat(walk( container.children ));
+				results = results.concat(walk(container.getChildren()));
 			}
 		}
 
