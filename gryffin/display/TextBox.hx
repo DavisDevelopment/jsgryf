@@ -19,6 +19,7 @@ class TextBox implements Paintable {
 	/* Constructor Function */
 	public function new():Void {
 		txt = '';
+		multiline = false;
 		stateChanged = true;
 		canvas = new Canvas();
 		padding = 0;
@@ -121,20 +122,39 @@ class TextBox implements Paintable {
 		if ( stateChanged ) {
 			stateChanged = false;
 
-			measure();
-			// resize the canvas to fit the text
-			canvas.resize(round(textWidth + padding*2), round(textHeight + padding*2));
-			var c:Ctx = canvas.context;
+			if ( multiline ) {
+				measure();
+				canvas.resize(round(textWidth + padding*2), round(textHeight + padding*2));
+				var c:Ctx = canvas.context;
 
-			/* draw the background, if any */
-			if (backgroundColor != null) {
-				c.fillStyle = backgroundColor.toString();
-				c.fillRect(0, 0, canvas.width, canvas.height);
+				if (backgroundColor != null) {
+					c.fillStyle = backgroundColor.toString();
+					c.fillRect(0, 0, canvas.width, canvas.height);
+				}
+
+				applyStyles( canvas.context );
+				var p:Point = new Point(padding, padding);
+				for (line in lines()) {
+					c.fillText(line.text, p.x, p.y);
+					p.y += line.height;
+				}
 			}
+			else {
+				measure();
+				// resize the canvas to fit the text
+				canvas.resize(round(textWidth + padding*2), round(textHeight + padding*2));
+				var c:Ctx = canvas.context;
 
-			/* draw the text to the canvas */
-			applyStyles( canvas.context );
-			canvas.context.fillText(text, padding, padding);
+				/* draw the background, if any */
+				if (backgroundColor != null) {
+					c.fillStyle = backgroundColor.toString();
+					c.fillRect(0, 0, canvas.width, canvas.height);
+				}
+
+				/* draw the text to the canvas */
+				applyStyles( canvas.context );
+				canvas.context.fillText(text, padding, padding);
+			}
 		}
 
 		return canvas;
@@ -168,10 +188,39 @@ class TextBox implements Paintable {
 	  * Measure the size of [text] when rendered with the current styles
 	  */
 	private function measure():Void {
-		applyStyles( canvas.context );
-		var size = canvas.context.measureText( text );
-		_textWidth = size.width;
-		_textHeight = (size.height);
+		if ( multiline ) {
+			_textWidth = 0;
+			_textHeight = 0;
+			for (l in lines()) {
+				_textWidth = max(_textWidth, l.width);
+				_textHeight += l.height;
+			}
+		}
+		else {
+			applyStyles( canvas.context );
+			var size = canvas.context.measureText( text );
+			_textWidth = size.width;
+			_textHeight = (size.height);
+		}
+	}
+
+	/**
+	  * get an Array of individual lines of text to be rendered
+	  */
+	private function lines():Array<TextLine> {
+		multiline = false;
+		var slines = text.split('\n');
+		var lines = new Array();
+		for (s in slines) {
+			var m = getMetrics( s );
+			lines.push({
+				'text'  : s,
+				'width' : m.width,
+				'height': m.height
+			});
+		}
+		multiline = true;
+		return lines;
 	}
 
 /* === Computed Instance Fields === */
@@ -311,7 +360,14 @@ class TextBox implements Paintable {
 	private var _align:TextAlign;
 	private var _bold:Bool;
 	private var _italic:Bool;
+	public var multiline:Bool;
 
 	private var _textWidth:Float;
 	private var _textHeight:Float;
 }
+
+typedef TextLine = {
+	var text : String;
+	var width : Float;
+	var height : Float;
+};
