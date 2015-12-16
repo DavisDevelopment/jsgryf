@@ -109,14 +109,15 @@ class EventDispatcher {
 	  */
 	private function __metaBind():Void {
 		var klass:Class<EventDispatcher> = Type.getClass( this );
-		var meta:Obj = Meta.getFields( klass );
-		var self:Obj = this;
+		var meta:Obj = Meta.getStatics( klass );
+		var self:Obj = klass;
 		for (key in meta.keys()) {
-			var metas:Obj = meta[key];
+			var metas:Obj = Obj.fromDynamic( meta[key] );
 			if (metas.exists('on')) {
 				var args:Array<String> = metas['on'];
+				var handler:Dynamic->Dynamic->Void = self[key];
 				for (name in args) {
-					on(name, self[key]);
+					on(name, handler.bind(this, _));
 				}
 			}
 		}
