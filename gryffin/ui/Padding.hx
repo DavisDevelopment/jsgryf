@@ -3,6 +3,18 @@ package gryffin.ui;
 import tannus.geom.Position;
 
 class Padding extends Position {
+/* === Instance Methods === */
+
+	/**
+	  * copy data from the given position to [this]
+	  */
+	public function copyFrom(other : Position):Void {
+		left = other.left;
+		right = other.right;
+		bottom = other.bottom;
+		top = other.top;
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the horizontal padding */
