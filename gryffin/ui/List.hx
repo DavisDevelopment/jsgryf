@@ -6,6 +6,7 @@ import gryffin.ui.ListItem;
 
 import tannus.geom.*;
 
+using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
@@ -30,7 +31,23 @@ class List <T : ListItem> extends EntityContainer {
 	  * Add an item to [this] List
 	  */
 	public function addItem(item : T):Void {
-		items.push( item );
+		if (!items.has( item )) {
+			items.push( item );
+			addChild( item );
+			item.parent = this;
+			if (stage != null) {
+				stage.registry[item.id] = item;
+				item.stage = stage;
+				item.dispatch('activated', stage);
+			}
+			else {
+				on('activated', function(stage:Stage) {
+					stage.registry[item.id] = item;
+					item.stage = stage;
+					item.dispatch('activated', stage);
+				});
+			}
+		}
 	}
 
 	/**
@@ -78,9 +95,9 @@ class List <T : ListItem> extends EntityContainer {
 	  * update [this] List
 	  */
 	override public function update(stage : Stage):Void {
-		super.update( stage );
-
 		positionItems( stage );
+
+		super.update( stage );
 	}
 
 /* === Instance Fields === */
