@@ -1,11 +1,14 @@
 package gryffin.core;
 
 import tannus.io.Signal;
+import tannus.ds.Obj;
+import haxe.rtti.Meta;
 
 class EventDispatcher {
 	/* Constructor Function */
 	public function new():Void {
 		__sigs = new Map();
+		__metaBind();
 	}
 
 /* === Instance Methods === */
@@ -99,6 +102,24 @@ class EventDispatcher {
 	public function forwardAll(events:Array<String>, target:EventDispatcher):Void {
 		for (e in events)
 			forward(e, target);
+	}
+
+	/**
+	  * Bind events based on meta-data
+	  */
+	private function __metaBind():Void {
+		var klass:Class<EventDispatcher> = Type.getClass( this );
+		var meta:Obj = Meta.getFields( klass );
+		var self:Obj = this;
+		for (key in meta.keys()) {
+			var metas:Obj = meta[key];
+			if (metas.exists('on')) {
+				var args:Array<String> = metas['on'];
+				for (name in args) {
+					on(name, self[key]);
+				}
+			}
+		}
 	}
 
 /* === Instance Fields === */
