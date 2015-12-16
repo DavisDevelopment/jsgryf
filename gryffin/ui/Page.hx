@@ -1,5 +1,8 @@
 package gryffin.ui;
 
+import tannus.geom.*;
+import tannus.events.ScrollEvent;
+
 import gryffin.core.*;
 import gryffin.display.*;
 
@@ -10,6 +13,10 @@ class Page extends EntityContainer {
 
 		_opened = false;
 		prev_page = null;
+		scrollY = 0;
+		viewport = new Rectangle();
+
+		on('scroll', scroll);
 	}
 
 /* === Instance Methods === */
@@ -54,6 +61,7 @@ class Page extends EntityContainer {
 	override public function update(s : Stage):Void {
 		if ( isOpen() ) {
 			super.update( s );
+			viewport = new Rectangle(0, 0, s.width, s.height);
 		}
 	}
 
@@ -66,6 +74,40 @@ class Page extends EntityContainer {
 		}
 	}
 
+	/**
+	  * scroll [this] Page
+	  */
+	private function scroll(e : ScrollEvent):Void {
+		scrollY += e.delta;
+	}
+
+	/**
+	  * get all children of [this] Page which 'contain' the given Point
+	  */
+	override public function getEntitiesAtPoint(p : Point):Array<Entity> {
+		if (isOpen()) {
+			return super.getEntitiesAtPoint(p);
+		}
+		else {
+			return new Array();
+		}
+	}
+
+	/**
+	  * check whether [p] is inside our content rectangle
+	  */
+	override public function containsPoint(p : Point):Bool {
+		return contentRect.containsPoint( p );
+	}
+
+/* === Instance Methods === */
+
+	/* the rectangle occupied by the content of [this] Page */
+	public var contentRect(get, never):Rectangle;
+	private function get_contentRect():Rectangle {
+		return new Rectangle();
+	}
+
 /* === Instance Fields === */
 
 	/* whether [this] Page is currently opened */
@@ -73,4 +115,10 @@ class Page extends EntityContainer {
 
 	/* the Page that was opened, when [this] one */
 	private var prev_page : Null<Page>;
+
+	/* the viewport rectangle */
+	public var viewport : Rectangle;
+
+	/* the offset from 0 of [this]'s scroll-position */
+	public var scrollY : Float;
 }
