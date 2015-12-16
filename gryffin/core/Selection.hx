@@ -4,6 +4,7 @@ import gryffin.core.*;
 
 import tannus.io.Getter;
 import tannus.nore.Selector;
+import tannus.ds.Obj;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -45,6 +46,24 @@ class Selection<T:Entity> {
 	  */
 	public function filter<O:T>(sel : Selector):Selection<O> {
 		return new Selection(sel, untyped Getter.create(selected));
+	}
+
+	/**
+	  * Invoke the given method with the given arguments on every selected Entity
+	  */
+	public function call(method:String, ?args:Array<Dynamic>):Void {
+		if (args == null)
+			args = new Array();
+		for (ent in selected) {
+			var e:Obj = ent;
+			trace(e.get( method ));
+			if (e.exists(method) && Reflect.isFunction(e[method])) {
+				Reflect.callMethod(ent, e[method], args);
+			}
+			else {
+				throw 'TypeError: \'$method\' is not a valid method of $ent';
+			}
+		}
 	}
 
 /* === Computed Instance Fields === */
