@@ -79,6 +79,16 @@ class ContextMenu extends List<ContextMenuItem> {
 		return mitem;
 	}
 
+	/**
+	  * add a button to [this] Menu
+	  */
+	public function button(text:String, cb:Void->Void):ContextMenuItem {
+		return item({
+			'label': text,
+			'click': cb
+		});
+	}
+
 /* === Instance Fields === */
 
 	public var max_width : Float;
