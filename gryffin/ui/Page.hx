@@ -105,7 +105,12 @@ class Page extends EntityContainer {
 	/* the rectangle occupied by the content of [this] Page */
 	public var contentRect(get, never):Rectangle;
 	private function get_contentRect():Rectangle {
-		return new Rectangle();
+		if (stage == null) {
+			return new Rectangle();
+		}
+		else {
+			return new Rectangle(0, 0, stage.width, stage.height);
+		}
 	}
 
 /* === Instance Fields === */
