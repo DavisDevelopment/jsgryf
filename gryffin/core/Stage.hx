@@ -3,8 +3,8 @@ package gryffin.core;
 import tannus.io.Signal;
 import tannus.io.Getter;
 import tannus.ds.Destructible;
-import tannus.events.MouseEvent;
-import tannus.events.KeyboardEvent;
+import tannus.ds.Delta;
+import tannus.events.*;
 import tannus.geom.*;
 import tannus.html.Win;
 
@@ -50,9 +50,18 @@ class Stage extends EventDispatcher {
 	  * Resize [this] Stage
 	  */
 	public function resize(w:Int, h:Int):Void {
+		var _w:Int = width;
+		var _h:Int = height;
 		canvas.width = w;
 		canvas.height = h;
 		ctx = canvas.getContext2d();
+		
+		if (!(width == _w && height == _h)) {
+			var o = new Area(_w, _h);
+			var n = new Area(width, height);
+			var event = new ResizeEvent(o, n);
+			dispatch('resize', event);
+		}
 	}
 
 	/**
@@ -145,8 +154,9 @@ class Stage extends EventDispatcher {
 			var vp = window.viewport;
 			if (vp != lastWindowSize) {
 				StageFiller.sheet();
-				canvas.width = (Std.int( vp.w ));
-				canvas.height = (Std.int( vp.h ));
+				var cw:Int = (Std.int( vp.w ));
+				var ch:Int = (Std.int( vp.h ));
+				resize(cw, ch);
 				lastWindowSize = vp;
 			}
 		}
