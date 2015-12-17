@@ -40,6 +40,16 @@ class Entity extends EventDispatcher {
 	}
 
 	/**
+	  * un-delete [this] Entity
+	  */
+	@:access(gryffin.Tools)
+	public function restore():Void {
+		destroyed = false;
+		stage.addChild( this );
+		Tools.used_idents.push( id );
+	}
+
+	/**
 	  * Mark [this] Entity as 'hidden'
 	  */
 	public function hide():Void {
