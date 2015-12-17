@@ -117,7 +117,9 @@ class EntityContainer extends Entity {
 	  */
 	public function getEntityAtPoint(p : Point):Null<Entity> {
 		var target:Null<Entity> = null;
-		for (e in getChildren()) {
+		var targets = getChildren().copy();
+		targets.reverse();
+		for (e in targets) {
 			if (e.containsPoint( p )) {
 				target = e;
 				if (Std.is(e, EntityContainer)) {
