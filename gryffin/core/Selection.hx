@@ -5,6 +5,7 @@ import gryffin.core.*;
 import tannus.io.Getter;
 import tannus.nore.Selector;
 import tannus.ds.Obj;
+import tannus.geom.*;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -49,6 +50,14 @@ class Selection<T:Entity> {
 	}
 
 	/**
+	  * stuff
+	  */
+	public function containsPoint(p : Point):Selection<T> {
+		var gettr:Getter<Array<T>> = Getter.create(all.macfilter(_.containsPoint(p)));
+		return new Selection(selector, gettr);
+	}
+
+	/**
 	  * Invoke the given method with the given arguments on every selected Entity
 	  */
 	public function call(method:String, ?args:Array<Dynamic>):Void {
@@ -56,14 +65,59 @@ class Selection<T:Entity> {
 			args = new Array();
 		for (ent in selected) {
 			var e:Obj = ent;
-			trace(e.get( method ));
-			if (e.exists(method) && Reflect.isFunction(e[method])) {
-				Reflect.callMethod(ent, e[method], args);
+			var f = e[method];
+			f = Reflect.callMethod.bind(ent, f, _);
+
+			try {
+				f( args );
 			}
-			else {
-				throw 'TypeError: \'$method\' is not a valid method of $ent';
+			catch(error : Dynamic) {
+				throw error;
 			}
 		}
+	}
+
+	/**
+	  * cache all selected items
+	  */
+	public function cache():Void {
+		selected.each(_.cache());
+	}
+
+	/**
+	  * uncache all selected items
+	  */
+	public function uncache():Void {
+		selected.each(_.uncache());
+	}
+
+	/* hide all */
+	public function hide():Void selected.each(_.hide());
+
+	/* show all */
+	public function show():Void selected.each(_.show());
+
+	/* deleted all */
+	public function delete():Void selected.each(_.delete());
+
+	/**
+	  * obtain a Selection consisting of the children of [this] Selection
+	  */
+	public function children():Selection<Entity> {
+		return new Selection('!String', _selectedChildren.bind());
+	}
+
+	/**
+	  * get an array of all children
+	  */
+	private function _selectedChildren():Array<Entity> {
+		var results = new Array();
+		for (e in selected) {
+			if (Std.is(e, EntityContainer)) {
+				results = results.concat(cast(e, EntityContainer).getChildren());
+			}
+		}
+		return results;
 	}
 
 /* === Computed Instance Fields === */
