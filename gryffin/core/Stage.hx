@@ -112,6 +112,7 @@ class Stage extends EventDispatcher {
 	  */
 	public function getEntityAtPoint(p : Point):Null<Entity> {
 		var target:Null<Entity> = null;
+		children.reverse();
 		for (e in children) {
 			if (e.containsPoint( p )) {
 				target = e;
@@ -124,6 +125,7 @@ class Stage extends EventDispatcher {
 				break;
 			}
 		}
+		children.reverse();
 		return target;
 	}
 	public function getEntityAt(x:Float, y:Float):Null<Entity> {
@@ -223,6 +225,9 @@ class Stage extends EventDispatcher {
 		dispatch(e.type, e);
 
 		var target:Null<Entity> = getEntityAtPoint(e.position);
+		if (e.type == 'click') {
+			trace( target );
+		}
 		if (target != null && !(target.isHidden()||target.isCached()||target.destroyed)) {
 			target.dispatch(e.type, e);
 		}
