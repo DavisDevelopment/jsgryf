@@ -14,9 +14,8 @@ class Page extends EntityContainer {
 		_opened = false;
 		prev_page = null;
 		scrollY = 0;
+		scroll_jump = 1;
 		viewport = new Rectangle();
-
-		on('scroll', scroll);
 	}
 
 /* === Instance Methods === */
@@ -34,6 +33,7 @@ class Page extends EntityContainer {
 
 			_opened = true;
 			dispatch('open', null);
+			stage.on('scroll', scroll);
 		}
 		else {
 			throw 'PageError: Cannot open Page before it is activated!';
@@ -78,7 +78,7 @@ class Page extends EntityContainer {
 	  * scroll [this] Page
 	  */
 	private function scroll(e : ScrollEvent):Void {
-		scrollY += e.delta;
+		scrollY -= (scroll_jump * e.delta);
 	}
 
 	/**
@@ -126,4 +126,7 @@ class Page extends EntityContainer {
 
 	/* the offset from 0 of [this]'s scroll-position */
 	public var scrollY : Float;
+
+	/* the number by which to increase [scrollY] on scroll-events */
+	public var scroll_jump : Float;
 }
