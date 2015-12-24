@@ -235,9 +235,6 @@ class Stage extends EventDispatcher {
 		dispatch(e.type, e);
 
 		var target:Null<Entity> = getEntityAtPoint(e.position);
-		if (e.type == 'click') {
-			trace( target );
-		}
 		if (target != null && !(target.isHidden()||target.isCached()||target.destroyed)) {
 			target.dispatch(e.type, e);
 		}
