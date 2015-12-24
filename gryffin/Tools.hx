@@ -84,6 +84,14 @@ class Tools {
 		return used_idents.remove( id );
 	}
 
+/* === Static Fields === */
+
+	/* the current Date, as a Float */
+	public static var now(get, never):Float;
+	private static inline function get_now():Float {
+		return (Date.now().getTime());
+	}
+
 	/* The current Window Object */
 	private static var win(get, never):Win;
 	private static inline function get_win():Win {
