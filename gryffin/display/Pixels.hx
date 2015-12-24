@@ -23,6 +23,13 @@ class Pixels {
 /* === Instance Methods === */
 
 	/**
+	  * get a Pixel
+	  */
+	public inline function at(x:Float, y:Float):Pixel {
+		return new Pixel(this, new Point(x, y));
+	}
+
+	/**
 	  * Get a Color
 	  */
 	public function get(xi:Float, ?y:Float):Color {
