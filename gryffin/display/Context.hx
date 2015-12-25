@@ -300,9 +300,18 @@ class Context {
 		ctx.arcTo(x1, y1, x2, y2, radius);
 	}
 
-
-	public function rect(x:Float, y:Float, w:Float, h:Float):Void {
+	/**
+	  * draw a rect
+	  */
+	public inline function rect(x:Float, y:Float, w:Float, h:Float):Void {
 		ctx.rect(x, y, w, h);
+	}
+
+	/**
+	  * draw a rect from a Rectangle instance
+	  */
+	public inline function drawRect(r : Rectangle):Void {
+		rect(r.x, r.y, r.w, r.h);
 	}
 
 	/**
