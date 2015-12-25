@@ -3,6 +3,14 @@ package gryffin.core;
 import tannus.io.Signal;
 import tannus.ds.Obj;
 import haxe.rtti.Meta;
+import tannus.io.RegEx;
+
+import gryffin.Tools.*;
+
+using StringTools;
+using tannus.ds.StringUtils;
+using Lambda;
+using tannus.ds.ArrayTools;
 
 class EventDispatcher {
 	/* Constructor Function */
@@ -109,16 +117,43 @@ class EventDispatcher {
 	  */
 	private function __metaBind():Void {
 		var klass:Class<EventDispatcher> = Type.getClass( this );
-		var meta:Obj = Meta.getStatics( klass );
-		var self:Obj = klass;
+		var meta:Obj = Meta.getFields( klass );
+		var self:Obj = this;
 		for (key in meta.keys()) {
 			var metas:Obj = Obj.fromDynamic( meta[key] );
 			if (metas.exists('on')) {
 				var args:Array<String> = metas['on'];
-				var handler:Dynamic->Dynamic->Void = self[key];
+				var handler:Dynamic->Void = self[key];
+				handler = cast Reflect.makeVarArgs(Reflect.callMethod.bind(this, handler, _));
 				for (name in args) {
-					on(name, handler.bind(this, _));
+					__mbind(name, handler);
 				}
+			}
+		}
+	}
+
+	/**
+	  * do fancy meta-binding
+	  */
+	private function __mbind(key:String, handler:Dynamic->Void):Void {
+		var forwardPattern:RegEx = ~/\[([A-Z0-9_]+)\]->(.+)/gi;
+		if (key.has(',')) {
+			var keys = key.split(',').macmap(_.trim());
+			for (k in keys) {
+				__mbind(k, handler);
+			}
+		}
+		else {
+			if (forwardPattern.match( key )) {
+				var data = forwardPattern.extract( key );
+				var self:Obj = this;
+				defer(function() {
+					var field:EventDispatcher = self[data[1]];
+					field.__mbind(data[2], handler);
+				});
+			}
+			else {
+				on(key, handler);
 			}
 		}
 	}
