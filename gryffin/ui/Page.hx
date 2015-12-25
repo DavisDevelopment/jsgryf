@@ -2,9 +2,16 @@ package gryffin.ui;
 
 import tannus.geom.*;
 import tannus.events.ScrollEvent;
+import tannus.io.Getter;
+import tannus.io.Ptr;
 
 import gryffin.core.*;
 import gryffin.display.*;
+
+import Math.*;
+import tannus.math.TMath;
+
+using tannus.math.TMath;
 
 class Page extends EntityContainer {
 	/* Constructor Function */
@@ -15,7 +22,8 @@ class Page extends EntityContainer {
 		prev_page = null;
 		scrollY = 0;
 		scroll_jump = 1;
-		viewport = new Rectangle();
+		bar = new ScrollBar(get_contentRect, get_viewport, Ptr.create(scrollY));
+		addChild( bar );
 	}
 
 /* === Instance Methods === */
@@ -61,7 +69,6 @@ class Page extends EntityContainer {
 	override public function update(s : Stage):Void {
 		if ( isOpen() ) {
 			super.update( s );
-			viewport = new Rectangle(0, 0, s.width, s.height);
 		}
 	}
 
@@ -78,7 +85,11 @@ class Page extends EntityContainer {
 	  * scroll [this] Page
 	  */
 	private function scroll(e : ScrollEvent):Void {
+		var cr = contentRect;
+		var vp = viewport;
+		var diff = (cr.h - vp.h);
 		scrollY -= (scroll_jump * e.delta);
+		scrollY = scrollY.clamp(0, diff);
 	}
 
 	/**
@@ -113,6 +124,12 @@ class Page extends EntityContainer {
 		}
 	}
 
+	/* the viewport-rectangle */
+	public var viewport(get, never):Rectangle;
+	private function get_viewport():Rectangle {
+		return stage.rect;
+	}
+
 /* === Instance Fields === */
 
 	/* whether [this] Page is currently opened */
@@ -121,12 +138,12 @@ class Page extends EntityContainer {
 	/* the Page that was opened, when [this] one */
 	private var prev_page : Null<Page>;
 
-	/* the viewport rectangle */
-	public var viewport : Rectangle;
-
 	/* the offset from 0 of [this]'s scroll-position */
 	public var scrollY : Float;
 
 	/* the number by which to increase [scrollY] on scroll-events */
 	public var scroll_jump : Float;
+
+	/* a ScrollBar for [this] Page */
+	public var bar : ScrollBar;
 }
