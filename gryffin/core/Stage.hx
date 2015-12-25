@@ -222,6 +222,29 @@ class Stage extends EventDispatcher {
 	}
 
 	/**
+	  * Create a DOM-like tree-representation of [this]'s children
+	  */
+	public function tree(?list:Array<Dynamic>, ?kids:Array<Entity>):Array<Dynamic> {
+		if (list == null)
+			list = new Array();
+		if (kids == null)
+			kids = children;
+		kids.reverse();
+		for (child in kids) {
+			if (Std.is(child, EntityContainer)) {
+				var c:EntityContainer = cast child;
+				var sub = tree(list, c.getChildren());
+				list.push(untyped [child, sub]);
+			}
+			else {
+				list.push( child );
+			}
+		}
+		kids.reverse();
+		return list;
+	}
+
+	/**
 	  * Query [this] Stage
 	  */
 	public function get<T:Entity>(sel : String):Selection<T> {
