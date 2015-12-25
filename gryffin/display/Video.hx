@@ -10,8 +10,12 @@ import tannus.io.Signal;
 import tannus.io.VoidSignal in VSignal;
 import tannus.ds.Delta;
 import tannus.ds.AsyncStack;
+import tannus.ds.AsyncPool;
+import tannus.ds.Promise;
+import tannus.ds.promises.*;
 
 import tannus.media.*;
+import gryffin.Tools.*;
 
 import tannus.http.Url;
 
@@ -36,6 +40,7 @@ class Video extends EventDispatcher implements Paintable {
 		onplay = new VSignal();
 		onpause = new VSignal();
 		onload = new VSignal();
+		onprogress = new Signal();
 
 		listen();
 	}
@@ -54,6 +59,48 @@ class Video extends EventDispatcher implements Paintable {
 	  */
 	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
 		c.drawImage(vid, s.x, s.y, s.w, s.h, d.x, d.y, d.w, d.h);
+	}
+
+	/**
+	  * Capture [this] Video onto a Canvas
+	  */
+	public function capture(x:Int=0, y:Int=0, ?w:Int, ?h:Int):Canvas {
+		if (w == null)
+			w = (width - x);
+		if (h == null)
+			h = (height - y);
+		var canvas:Canvas = Canvas.create(w, h);
+		canvas.context.drawImage(vid, x, y, width, height, 0, 0, w, h);
+		return canvas;
+	}
+
+	/**
+	  * Get 'all' frames of [this] Video
+	  */
+	public function frames(step : Int = 1):ArrayPromise<Canvas> {
+		return Promise.create({
+			var stack = new AsyncStack();
+			var results = new Array();
+			var i:Int = 0;
+			var len:Int = duration.totalSeconds;
+			while (i < len) {
+				stack.push(get_frame.bind(i, results, _));
+
+				i += step;
+			}
+			stack.run(function() return results);
+		}).array();
+	}
+
+	private function get_frame(n:Int, list:Array<Canvas>, done:Void->Void):Void {
+		defer(function() {
+			currentTime = n;
+			oncanplay.once(function() {
+				var c = capture();
+				list.push( c );
+				done();
+			});
+		});
 	}
 
 	/**
@@ -118,6 +165,9 @@ class Video extends EventDispatcher implements Paintable {
 		on('play', onplay.fire);
 		on('pause', onpause.fire);
 		on('load', onload.fire);
+		on('progress', function(e) {
+			trace( e );
+		});
 
 		durationChanged();
 		volumeChanged();
@@ -233,6 +283,7 @@ class Video extends EventDispatcher implements Paintable {
 	public var oncanplay : VSignal;
 	public var onplay : VSignal;
 	public var onpause : VSignal;
+	public var onprogress : Signal<Percent>;
 
 	public var ondurationchange : Signal<Delta<Duration>>;
 	public var onvolumechange : Signal<Delta<Float>>;
