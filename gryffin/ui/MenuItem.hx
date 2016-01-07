@@ -193,8 +193,8 @@ class MenuItem extends EventDispatcher {
 
 			if (subMenu && child) {
 				item.y = (y + iy);
-				item.x = (x + w + 30);
-				iy += item.padding.bottom;
+				item.x = (x + parent.panelWidth);
+				iy += itemHeight;
 			}
 			else {
 				item.y = (root.y + root.h + iy);
