@@ -166,7 +166,7 @@ class Video extends EventDispatcher implements Paintable {
 		on('pause', onpause.fire);
 		on('load', onload.fire);
 		on('progress', function(e) {
-			trace( e );
+			onprogress.call( progress );
 		});
 
 		durationChanged();
@@ -247,9 +247,13 @@ class Video extends EventDispatcher implements Paintable {
 	private inline function set_currentTime(v : Float):Float return (vid.currentTime = v);
 
 	/* the current 'progress' of [this] Video */
-	public var progress(get, never):Percent;
+	public var progress(get, set):Percent;
 	private inline function get_progress():Percent {
 		return Percent.percent(currentTime, vid.duration);
+	}
+	private function set_progress(v : Percent):Percent {
+		currentTime = v.of( vid.duration );
+		return progress;
 	}
 
 	/* the playbackRate of [this] Video */
