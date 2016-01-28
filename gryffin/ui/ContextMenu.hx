@@ -73,8 +73,8 @@ class ContextMenu extends List<ContextMenuItem> {
 	/**
 	  * add an item to [this] menu
 	  */
-	public function item(data : Dynamic):ContextMenuItem {
-		var mitem:ContextMenuItem = new ContextMenuItem(this, data);
+	public function item(btn : Button):ContextMenuItem {
+		var mitem:ContextMenuItem = new ContextMenuItem(this, btn);
 		addItem( mitem );
 		return mitem;
 	}
@@ -82,9 +82,9 @@ class ContextMenu extends List<ContextMenuItem> {
 	/**
 	  * add a button to [this] Menu
 	  */
-	public function button(text:String, cb:Void->Void):ContextMenuItem {
+	public function button(text:String, cb:MouseEvent -> Void):ContextMenuItem {
 		return item({
-			'label': text,
+			'text': text,
 			'click': cb
 		});
 	}
