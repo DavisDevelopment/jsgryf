@@ -8,8 +8,14 @@ import tannus.ds.Ref;
 import tannus.io.Getter;
 import tannus.io.VoidSignal;
 
+import Math.*;
+import tannus.math.TMath;
+
 import js.html.Image in Img;
 import js.Browser.document in doc;
+
+using tannus.math.TMath;
+using tannus.ds.ArrayTools;
 
 class Image implements Paintable {
 	/* Constructor Function */
@@ -74,6 +80,38 @@ class Image implements Paintable {
 	  */
 	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
 		c.drawImage(img, s.x, s.y, s.w, s.h, d.x, d.y, d.w, d.h);
+	}
+
+	/**
+	  * Rotate [this] Image
+	  */
+	public function rotate(angle : Angle):Canvas {
+		var r = new Rectangle(0, 0, width, height);
+		var rr = rotatedSize( angle );
+		var can = Canvas.create(floor(rr.w), floor(rr.h));
+		var cr = new Rectangle(0, 0, can.width, can.height);
+		var c = can.context;
+		c.save();
+		c.translate(cr.centerX, cr.centerY);
+		c.rotate( angle.radians );
+		c.translate(-cr.centerX, -cr.centerY);
+		c.drawImage(img, 0, 0, width, height, 0, 0, cr.w, cr.h);
+		c.restore();
+		return can;
+	}
+
+	/**
+	  * Get the size of [this] Image, if rotated by the given Angle
+	  */
+	public function rotatedSize(angle : Angle):Rectangle {
+		var r = angle.radians;
+		var a = (width * cos( r ));
+		var b = (height * sin( r ));
+		var rotatedWidth = (a + b);
+		var p = (width * sin(r));
+		var q = (height * cos(r));
+		var rotatedHeight = (p + q);
+		return new Rectangle(0, 0, rotatedWidth, rotatedHeight);
 	}
 
 /* === Computed Instance Fields === */
