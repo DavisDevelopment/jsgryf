@@ -177,7 +177,9 @@ class Stage extends EventDispatcher {
 		});
 
 		/* clear the Canvas */
-		ctx.erase();
+		if ( !noclear ) {
+			ctx.erase();
+		}
 
 		/* for every Entity on [this] Stage */
 		for (child in children) {
@@ -330,6 +332,7 @@ class Stage extends EventDispatcher {
 	public var ctx : Ctx;
 	public var children : Array<Entity>;
 	public var registry : Map<String, Entity>;
+	public var noclear : Bool = false;
 
 	private var manager : FrameManager;
 	private var mouseManager : MouseListener;
