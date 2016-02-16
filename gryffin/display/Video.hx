@@ -12,6 +12,7 @@ import tannus.ds.Delta;
 import tannus.ds.AsyncStack;
 import tannus.ds.AsyncPool;
 import tannus.ds.Promise;
+import tannus.ds.Stateful;
 import tannus.ds.promises.*;
 
 import tannus.media.*;
@@ -22,7 +23,7 @@ import tannus.http.Url;
 import js.html.VideoElement in Vid;
 import js.html.MediaError;
 
-class Video extends EventDispatcher implements Paintable {
+class Video extends EventDispatcher implements Paintable implements Stateful<VideoState> {
 	/* Constructor Function */
 	public function new(?el : Vid):Void {
 		super();
@@ -141,7 +142,9 @@ class Video extends EventDispatcher implements Paintable {
 	public function getState():VideoState {
 		return {
 			'volume': volume,
-			'speed': playbackRate
+			'speed': playbackRate,
+			'duration': vid.duration,
+			'time': vid.currentTime
 		};
 	}
 
@@ -151,6 +154,7 @@ class Video extends EventDispatcher implements Paintable {
 	public function setState(state : VideoState):Void {
 		volume = state.volume;
 		playbackRate = state.speed;
+		currentTime = state.time;
 	}
 
 	/**
@@ -306,5 +310,7 @@ class Video extends EventDispatcher implements Paintable {
 
 typedef VideoState = {
 	volume : Float,
-	speed : Float
+	speed : Float,
+	duration : Float,
+	time : Float
 };
