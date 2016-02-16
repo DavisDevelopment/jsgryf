@@ -11,10 +11,11 @@ import tannus.events.*;
 
 class ContextMenuItem extends ListItem {
 	/* Constructor Function */
-	public function new(m:ContextMenu, data:Dynamic):Void {
+	public function new(m:ContextMenu, data:Button):Void {
 		super();
 
 		menu = m;
+		button = data;
 		hovered = false;
 		padding = new Padding();
 		box = new TextBox();
@@ -23,8 +24,6 @@ class ContextMenuItem extends ListItem {
 
 		padding.vertical = 8;
 		padding.horizontal = 6;
-
-		yank( data );
 	}
 
 /* === Instance Methods === */
@@ -44,6 +43,8 @@ class ContextMenuItem extends ListItem {
 		else {
 			hovered = false;
 		}
+
+		box.text = button.text;
 	}
 
 	/**
@@ -54,23 +55,12 @@ class ContextMenuItem extends ListItem {
 	}
 
 	/**
-	  * yank data onto [this]
-	  */
-	private function yank(data : Obj):Void {
-		if (data.exists('label')) {
-			text = data['label'];
-		}
-		if (data.exists('click')) {
-			on('click', data['click']);
-		}
-	}
-
-	/**
 	  * when [this] item gets clicked
 	  */
+	@:keep
 	@on('click')
-	public static function click(self:ContextMenuItem, e:MouseEvent):Void {
-		self.menu.delete();
+	public function click(self:ContextMenuItem, e:MouseEvent):Void {
+		button.click( e );
 	}
 
 /* === Computed Instance Fields === */
@@ -94,4 +84,5 @@ class ContextMenuItem extends ListItem {
 	public var box : TextBox;
 	public var hovered : Bool;
 	public var padding : Padding;
+	public var button : Button;
 }
