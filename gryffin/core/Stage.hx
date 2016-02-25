@@ -77,6 +77,13 @@ class Stage extends EventDispatcher {
 	}
 
 	/**
+	  * Check whether [child] is a child of [this] Stage
+	  */
+	public function hasChild(child : Entity):Bool {
+		return children.has( child );
+	}
+
+	/**
 	  * Cause the Canvas to scale to fit the Window
 	  */
 	public function fill():Void {
