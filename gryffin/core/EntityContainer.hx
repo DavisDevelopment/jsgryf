@@ -43,6 +43,13 @@ class EntityContainer extends Entity {
 	}
 
 	/**
+	  * check whether [child] is a child of [this]
+	  */
+	public function hasChild(child : Entity):Bool {
+		return getChildren().has( child );
+	}
+
+	/**
 	  * report [this]'s list of children
 	  * default behavior is to just return [children], but sub-classes can 
 	  * override this
