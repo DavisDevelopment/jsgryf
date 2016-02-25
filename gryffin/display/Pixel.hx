@@ -33,6 +33,16 @@ class Pixel {
 		color = color.greyscale();
 	}
 
+	private function rel(x:Int, y:Int):Null<Pixel> {
+		var rx:Float = (pos.x + x), ry:Float = (pos.y + y);
+		if (rx <= src.width && ry <= src.height) {
+			return src.at(rx, ry);
+		}
+		else {
+			return null;
+		}
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the color of [this] Pixel */
@@ -59,6 +69,18 @@ class Pixel {
 	public var alpha(get, set):Int;
 	private inline function get_alpha():Int return src.get_alpha(pos.x, pos.y);
 	private inline function set_alpha(v : Int):Int return src.set_alpha(pos.x, pos.y, v);
+
+	public var top(get, never):Null<Pixel>;
+	private inline function get_top():Null<Pixel> return rel(0, -1);
+
+	public var right(get, never):Null<Pixel>;
+	private inline function get_right():Null<Pixel> return rel(1, 0);
+
+	public var bottom(get, never):Null<Pixel>;
+	private inline function get_bottom():Null<Pixel> return rel(0, 1);
+
+	public var left(get, never):Null<Pixel>;
+	private inline function get_left():Null<Pixel> return rel(-1, 0);
 
 	private var c(get, never):Color;
 	private inline function get_c():Color return new Color(red, green, blue, alpha);
