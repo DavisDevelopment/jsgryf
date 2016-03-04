@@ -55,7 +55,7 @@ class EntityContainer extends Entity {
 	  * override this
 	  */
 	public function getChildren():Array<Entity> {
-		return children;
+		return children.filter( isValidChild );
 	}
 
 	/**
@@ -85,8 +85,9 @@ class EntityContainer extends Entity {
 
 		/* update [children] */
 		for (e in getChildren()) {
-			if ( !e._cached )
+			if (!e._cached && shouldChildUpdate( e )) {
 				e.update( s );
+			}
 		}
 	}
 
@@ -97,8 +98,9 @@ class EntityContainer extends Entity {
 		super.render(s, c);
 
 		for (e in getChildren()) {
-			if ( !e._hidden )
+			if (!e._hidden && shouldChildRender( e )) {
 				e.render(s, c);
+			}
 		}
 	}
 
@@ -142,6 +144,27 @@ class EntityContainer extends Entity {
 	}
 	public function getEntityAt(x:Float, y:Float):Null<Entity> {
 		return getEntityAtPoint(new Point(x, y));
+	}
+
+	/**
+	  * additional filter(s) to apply to the children of [this] Entity
+	  */
+	public function isValidChild(child : Entity):Bool {
+		return true;
+	}
+
+	/**
+	  * additional filtering for updating children
+	  */
+	public function shouldChildUpdate(child : Entity):Bool {
+		return true;
+	}
+
+	/**
+	  * additional filtering for rendering children
+	  */
+	public function shouldChildRender(child : Entity):Bool {
+		return true;
 	}
 
 /* === Instance Fields === */
