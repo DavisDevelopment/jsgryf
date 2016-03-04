@@ -77,8 +77,10 @@ class List <T : ListItem> extends EntityContainer {
 	private function positionItems(stage : Stage):Void {
 		var ip:Point = firstPos();
 		for (item in items) {
-			updateItem(stage, item);
-			positionItem(ip, item);
+			if (isValidChild( item )) {
+				updateItem(stage, item);
+				positionItem(ip, item);
+			}
 		}
 	}
 
