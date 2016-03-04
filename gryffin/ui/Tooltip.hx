@@ -189,6 +189,20 @@ class Tooltip extends Entity {
 	private inline function get_textColor():Color return box.color;
 	private inline function set_textColor(v : Color):Color return (box.color = v);
 
+	/* whether [this] Tooltip can render multiline text */
+	public var multiline(get, set):Bool;
+	private inline function get_multiline():Bool return box.multiline;
+	private inline function set_multiline(v : Bool):Bool return (box.multiline = v);
+
+	/* the font used by [this] Tooltip */
+	public var fontFamily(get, set):String;
+	private inline function get_fontFamily():String return box.fontFamily;
+	private inline function set_fontFamily(v : String):String return (box.fontFamily = v);
+
+	public var fontSize(get, set):Int;
+	private inline function get_fontSize():Int return box.fontSize;
+	private inline function set_fontSize(v : Int):Int return (box.fontSize = v);
+
 /* === Instance Fields === */
 
 	public var direction : Direction;
