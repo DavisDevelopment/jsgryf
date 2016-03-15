@@ -16,12 +16,16 @@ import tannus.ds.Stateful;
 import tannus.ds.promises.*;
 
 import tannus.media.*;
+import Math.*;
+import tannus.math.TMath.*;
 import gryffin.Tools.*;
 
 import tannus.http.Url;
 
 import js.html.VideoElement in Vid;
 import js.html.MediaError;
+
+using tannus.math.TMath;
 
 class Video extends EventDispatcher implements Paintable implements Stateful<VideoState> {
 	/* Constructor Function */
@@ -42,6 +46,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		onpause = new VSignal();
 		onload = new VSignal();
 		onprogress = new Signal();
+		onloadedmetadata = new VSignal();
 
 		listen();
 	}
@@ -123,17 +128,26 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/**
 	  * Loads the given Url, and alerts the caller when complete
 	  */
-	public function load(url:String, cb:Void->Void):Void {
+	public function load(url:String, ?can_manipulate:Void->Void, ?can_play:Void->Void):Void {
 		pause();
 
-		onload.once(function() trace('VIDEO LOADED'));
-		oncanplay.once( cb );
+		src = url;
+
+		onloadedmetadata.once(function() {
+			trace( 'video\'s metadata has been loaded' );
+			if (can_manipulate != null) {
+				can_manipulate();
+			}
+		});
+		oncanplay.once(function() {
+			trace('video can be played now');
+			if (can_play != null) {
+				can_play();
+			}
+		});
 		onerror.once(function(error : Dynamic):Void {
 			js.Browser.console.error( error );
-			cb();
 		});
-		
-		src = url;
 	}
 
 	/**
@@ -142,9 +156,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	public function getState():VideoState {
 		return {
 			'volume': volume,
-			'speed': playbackRate,
-			'duration': vid.duration,
-			'time': vid.currentTime
+			'speed': playbackRate
 		};
 	}
 
@@ -154,7 +166,6 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	public function setState(state : VideoState):Void {
 		volume = state.volume;
 		playbackRate = state.speed;
-		currentTime = state.time;
 	}
 
 	/**
@@ -172,6 +183,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		on('progress', function(e) {
 			onprogress.call( progress );
 		});
+		on('loadedmetadata', onloadedmetadata.fire);
 
 		durationChanged();
 		volumeChanged();
@@ -263,7 +275,11 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/* the playbackRate of [this] Video */
 	public var playbackRate(get, set):Float;
 	private inline function get_playbackRate():Float return (vid.playbackRate);
-	private inline function set_playbackRate(v : Float):Float return (vid.playbackRate = v);
+	private function set_playbackRate(v : Float):Float {
+		vid.playbackRate = v;
+		vid.playbackRate = (round(vid.playbackRate * 100) / 100);
+		return vid.playbackRate;
+	}
 
 	/* whether [this] Video is currently paused */
 	public var paused(get, never):Bool;
@@ -272,7 +288,9 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/* the volume of [this] Video */
 	public var volume(get, set):Float;
 	private inline function get_volume() return vid.volume;
-	private inline function set_volume(v : Float):Float return (vid.volume = v);
+	private function set_volume(v : Float):Float {
+		return (vid.volume = v.clamp(0, 1));
+	}
 
 	/* whether [this] Video is currently muted */
 	public var muted(get, set):Bool;
@@ -292,6 +310,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	public var onplay : VSignal;
 	public var onpause : VSignal;
 	public var onprogress : Signal<Percent>;
+	public var onloadedmetadata : VSignal;
 
 	public var ondurationchange : Signal<Delta<Duration>>;
 	public var onvolumechange : Signal<Delta<Float>>;
@@ -310,7 +329,5 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 
 typedef VideoState = {
 	volume : Float,
-	speed : Float,
-	duration : Float,
-	time : Float
+	speed : Float
 };
