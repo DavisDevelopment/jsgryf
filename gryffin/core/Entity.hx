@@ -1,5 +1,4 @@
 package gryffin.core;
-
 import tannus.geom.Point;
 import tannus.internal.TypeTools.typename;
 import tannus.io.Ptr;
@@ -180,6 +179,23 @@ class Entity extends EventDispatcher {
 	  */
 	public function removeEffect(e : Effect<Dynamic>):Void {
 		effects.remove( e );
+	}
+
+	/**
+	  * get the nearest [parent] for whom [test] returns `true`
+	  */
+	public function parentUntil<T : EntityContainer>(test : EntityContainer -> Bool):Null<T> {
+		if (parent == null) {
+			return null;
+		}
+		else {
+			if (test( parent )) {
+				return untyped parent;
+			}
+			else {
+				return parent.parentUntil( test );
+			}
+		}
 	}
 
 /* === Instance Fields === */
