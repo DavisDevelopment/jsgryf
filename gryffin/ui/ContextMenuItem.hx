@@ -44,6 +44,10 @@ class ContextMenuItem extends ListItem {
 			hovered = false;
 		}
 
+		if ( hovered ) {
+			s.cursor = 'pointer';
+		}
+
 		box.text = button.text;
 	}
 
