@@ -4,10 +4,10 @@ import tannus.graphics.Color;
 
 class Border {
 	/* Constructor Function */
-	public function new(size:Float=0, ?colr:Color):Void {
+	public function new(size:Float=0, ?colr:Color, ?rad:Float):Void {
 		width = size;
-		radius = 0;
-		color = new Color(0, 0, 0);
+		radius = (rad != null ? rad : 0);
+		color = (colr != null ? colr : new Color(0, 0, 0));
 	}
 
 /* === Instance Methods === */
