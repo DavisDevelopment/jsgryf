@@ -24,7 +24,7 @@ class MenuItem extends EventDispatcher {
 
 		type = 'normal';
 		icon = null;
-		checkIcon = Image.load('../assets/check.png');
+		checkIcon = null;
 		rect = new Rectangle();
 		parent = null;
 		items = new Array();
@@ -55,6 +55,15 @@ class MenuItem extends EventDispatcher {
 	}
 
 /* === Instance Methods === */
+
+	/**
+	  * create and append a new MenuItem
+	  */
+	public function item(o : Obj):MenuItem {
+		var i = new MenuItem( o );
+		append( i );
+		return i;
+	}
 
 	/**
 	  * Render [this] MenuItem
@@ -99,7 +108,7 @@ class MenuItem extends EventDispatcher {
 		}
 
 		// draw the checkbox-icon
-		if (type == 'checkbox' && checked) {
+		if (type == 'checkbox' && checkIcon != null && checked) {
 			var i = checkIcon;
 			var size = (h + padding.vertical);
 			c.drawComponent(i, 0, 0, i.width, i.height, x, y, size, size);
@@ -424,6 +433,6 @@ class MenuItem extends EventDispatcher {
 	private var eventsBound : Bool;
 	private var hoverStart : Null<Float>;
 	private var beenHovered : Float;
-	private var checkIcon : Image;
+	private var checkIcon : Null<Image>;
 	public var padding : Padding;
 }

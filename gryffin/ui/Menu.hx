@@ -6,6 +6,7 @@ import gryffin.ui.*;
 
 import tannus.geom.*;
 import tannus.ds.Object;
+import tannus.ds.Obj;
 import tannus.events.MouseEvent;
 import tannus.graphics.Color;
 import tannus.math.TMath.*;
@@ -24,6 +25,15 @@ class Menu extends Entity {
 	}
 
 /* === Instance Methods === */
+
+	/**
+	  * Create and append a new MenuItem
+	  */
+	public function item(options : Obj):MenuItem {
+		var i = new MenuItem( options );
+		append( i );
+		return i;
+	}
 
 	/**
 	  * Append a MenuItem to [this] Menu
@@ -97,8 +107,9 @@ class Menu extends Entity {
 	  */
 	public function itemClicked(item : MenuItem):Void {
 		if ( !item.subMenu ) {
-			for (i in walk())
+			for (i in walk()) {
 				i.showChildren = false;
+			}
 		}
 	}
 
