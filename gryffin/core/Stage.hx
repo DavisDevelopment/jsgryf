@@ -32,6 +32,7 @@ class Stage extends EventDispatcher {
 		ctx = canvas.getContext2d();
 		children = new Array();
 		registry = new Map();
+		styles = new GlobalStyles( this );
 		manager = new FrameManager();
 		mouseManager = new MouseListener( this );
 		keyManager = new KeyListener( this );
@@ -88,6 +89,21 @@ class Stage extends EventDispatcher {
 	  */
 	public function fill():Void {
 		_fill = true;
+		styles.fill();
+	}
+
+	/**
+	  * Load a custom font-face
+	  */
+	public function loadFontFace(family:String, source:String):Void {
+		styles.addFont(family, source);
+	}
+
+	/**
+	  * Check whether the given font-face has been loaded
+	  */
+	public function isFontFaceLoaded(family : String):Bool {
+		return styles.hasFont( family );
 	}
 
 	/**
@@ -160,7 +176,6 @@ class Stage extends EventDispatcher {
 		if ( _fill ) {
 			var vp = window.viewport;
 			if (vp != lastWindowSize) {
-				StageFiller.sheet();
 				var cw:Int = (Std.int( vp.w ));
 				var ch:Int = (Std.int( vp.h ));
 				resize(cw, ch);
@@ -345,6 +360,7 @@ class Stage extends EventDispatcher {
 	private var mouseManager : MouseListener;
 	private var keyManager : KeyListener;
 	private var mouseWatcher : MouseWatcher;
+	private var styles : GlobalStyles;
 
 	/* dictates whether or not to scale the Canvas to fit the window */
 	private var _fill : Bool;
