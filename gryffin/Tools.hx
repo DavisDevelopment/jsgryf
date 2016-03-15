@@ -18,6 +18,7 @@ using tannus.ds.ArrayTools;
 /**
   * Utility class of 'global' Functions
   */
+@:expose('gryfutils')
 class Tools {
 	/**
 	  * Wait [ms] milliseconds, then invoke [action]
@@ -30,7 +31,7 @@ class Tools {
 	  * Delay the invokation of the given Function till the end of the current Stack
 	  */
 	public static function defer(f : Void->Void):Void {
-		wait(5, f);
+		wait(10, f);
 	}
 
 	/**
