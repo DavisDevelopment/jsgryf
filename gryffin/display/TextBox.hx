@@ -25,6 +25,7 @@ class TextBox implements Paintable {
 		padding = 0;
 		fontFamily = 'Arial';
 		fontSize = 12;
+		fontSizeUnit = 'pt';
 		_color = new Color(0, 0, 0);
 		_backgroundColor = null;
 		_align = Start;
@@ -179,7 +180,7 @@ class TextBox implements Paintable {
 			bits.push('bold');
 		if ( italic )
 			bits.push('italic');
-		bits.push( '${fontSize}pt' );
+		bits.push( '${fontSize}${fontSizeUnit}' );
 		bits.push( fontFamily );
 		return bits.join(' ');
 	}
@@ -265,6 +266,18 @@ class TextBox implements Paintable {
 			stateChanged = true;
 		}
 		return (_fontSize = v);
+	}
+
+	/* font size unit */
+	public var fontSizeUnit(get, set):String;
+	private function get_fontSizeUnit():String {
+		return _fontSizeUnit;
+	}
+	private function set_fontSizeUnit(v : String):String {
+		if (v != _fontSizeUnit) {
+			stateChanged = true;
+		}
+		return (_fontSizeUnit = v);
 	}
 
 	/* the width of the rendered text */
@@ -355,6 +368,7 @@ class TextBox implements Paintable {
 	private var _padding:Float;
 	private var _fontFamily:String;
 	private var _fontSize:Int;
+	private var _fontSizeUnit:String;
 	private var _color:Color;
 	private var _backgroundColor:Null<Color>;
 	private var _align:TextAlign;
