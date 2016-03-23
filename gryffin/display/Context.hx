@@ -287,6 +287,16 @@ class Context {
 	}
 
 	/**
+	  * draw a triangle
+	  */
+	public function drawTriangle(t : Triangle):Void {
+		moveToPoint( t.one );
+		lineToPoint( t.two );
+		lineToPoint( t.three );
+		lineToPoint( t.one );
+	}
+
+	/**
 	  * draw a line from a Line instance
 	  */
 	public inline function drawLine(line : Line):Void {
