@@ -23,7 +23,7 @@ using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 
 @:access( gryffin.display.Canvas )
-class Stage extends EventDispatcher {
+class Stage extends EventDispatcher implements Container {
 	/* Constructor Function */
 	public function new(can : Canvas):Void {
 		super();
