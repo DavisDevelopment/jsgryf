@@ -34,4 +34,13 @@ class Padding extends Position {
 		bottom = v;
 		return v;
 	}
+
+	/* the padding for every side */
+	public var all(get, set):Float;
+	private inline function get_all():Float {
+		return left;
+	}
+	private inline function set_all(v : Float):Float {
+		return (left = right = bottom = top = v);
+	}
 }
