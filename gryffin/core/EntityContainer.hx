@@ -10,7 +10,7 @@ import tannus.geom.*;
 using Lambda;
 using tannus.ds.ArrayTools;
 
-class EntityContainer extends Entity {
+class EntityContainer extends Entity implements Container {
 	/* Constructor Function */
 	public function new():Void {
 		super();
