@@ -48,8 +48,10 @@ class MenuItem extends EventDispatcher {
 		padding.horizontal = 5;
 		padding.vertical = 5;
 
-		if (options != null)
+		if (options != null) {
+			this.options = options;
 			handleOptions( options );
+		}
 
 		on('open', function(x) trace('opening $label'));
 	}
@@ -224,8 +226,14 @@ class MenuItem extends EventDispatcher {
 		if (type == 'normal') {
 			var sc:Bool = showChildren;
 			root.itemClicked( this );
-			if (subMenu)
-				showChildren = !sc;
+			if ( subMenu ) {
+				if (options != null && !options.exists('click')) {
+					showChildren = !sc;
+				}
+				else if (options == null) {
+					showChildren = !sc;
+				}
+			}
 			dispatch('click', e);
 		}
 		else if (type == 'checkbox') {
@@ -405,7 +413,7 @@ class MenuItem extends EventDispatcher {
 	}
 
 	/* whether to render child-items of [this] */
-	private var showChildren(default, set):Bool;
+	public var showChildren(default, set):Bool;
 	private function set_showChildren(v : Bool):Bool {
 		dispatch(v?'open':'close', null);
 		return (showChildren = v);
@@ -434,5 +442,6 @@ class MenuItem extends EventDispatcher {
 	private var hoverStart : Null<Float>;
 	private var beenHovered : Float;
 	private var checkIcon : Null<Image>;
+	private var options : Null<Obj>;
 	public var padding : Padding;
 }
