@@ -83,30 +83,58 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/**
 	  * Get 'all' frames of [this] Video
 	  */
-	public function frames(step : Int = 1):ArrayPromise<Canvas> {
+	public function frames(jumpSeconds:Int, oncapture:Int -> Canvas -> Void):ArrayPromise<Canvas> {
 		return Promise.create({
 			var stack = new AsyncStack();
 			var results = new Array();
 			var i:Int = 0;
 			var len:Int = duration.totalSeconds;
 			while (i < len) {
-				stack.push(get_frame.bind(i, results, _));
+				stack.push(function( next ) {
+					get_frame(i.clamp(0, len), results, function( canvas ) {
+						oncapture(i, canvas);
+						next();
+					});
+				});
 
-				i += step;
+				i += jumpSeconds;
 			}
 			stack.run(function() return results);
 		}).array();
 	}
 
-	private function get_frame(n:Int, list:Array<Canvas>, done:Void->Void):Void {
+	private function get_frame(n:Int, list:Array<Canvas>, done:Canvas->Void):Void {
 		defer(function() {
 			currentTime = n;
 			oncanplay.once(function() {
 				var c = capture();
 				list.push( c );
-				done();
+				done( c );
 			});
 		});
+	}
+
+	/**
+	  * get the approximate number of frames in [this] Video
+	  */
+	public function frameCount():Int {
+		return (duration.totalSeconds * FPS);
+	}
+
+	/**
+	  * get the index of the current frame
+	  */
+	public function currentFrame():Int {
+		var ct:Duration = currentTime;
+		return (ct.totalSeconds * FPS);
+	}
+
+	/**
+	  * jump to the given frame
+	  */
+	public function gotoFrame(frameIndex : Int):Void {
+		var frameTime:Float = (1.0 / FPS);
+		currentTime = (frameIndex * frameTime);
 	}
 
 	/**
@@ -325,6 +353,8 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	private static inline function createVid():Vid {
 		return js.Browser.document.createVideoElement();
 	}
+
+	private static inline var FPS : Int = 30;
 }
 
 typedef VideoState = {
