@@ -45,7 +45,7 @@ class MenuItem extends EventDispatcher {
 		keyBox.color = box.color.darken( 45 );
 
 		padding = new Padding();
-		padding.horizontal = 5;
+		padding.horizontal = 8;
 		padding.vertical = 5;
 
 		if (options != null) {
@@ -228,10 +228,10 @@ class MenuItem extends EventDispatcher {
 			root.itemClicked( this );
 			if ( subMenu ) {
 				if (options != null && !options.exists('click')) {
-					showChildren = !sc;
+					toggleOpen();
 				}
 				else if (options == null) {
-					showChildren = !sc;
+					toggleOpen();
 				}
 			}
 			dispatch('click', e);
@@ -240,6 +240,40 @@ class MenuItem extends EventDispatcher {
 			root.itemClicked( this );
 			checked = !checked;
 			dispatch((!checked?'un':'')+'check', e);
+		}
+	}
+
+	/**
+	  * open [this] Menu
+	  */
+	public function open():Void {
+		root.closeAll();
+
+		showChildren = true;
+		dispatch('open', this);
+	}
+
+	/**
+	  * close [this] Menu
+	  */
+	public function close():Void {
+		for (item in items) {
+			item.close();
+		}
+
+		showChildren = false;
+		dispatch('close', this);
+	}
+
+	/**
+	  * toggle whether [this] menu is open
+	  */
+	public function toggleOpen():Void {
+		if ( showChildren ) {
+			close();
+		}
+		else {
+			open();
 		}
 	}
 
