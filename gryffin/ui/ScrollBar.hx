@@ -25,6 +25,8 @@ class ScrollBar extends Entity {
 		_cr = cr;
 		_vp = vp;
 		_scroll = sy;
+
+		on('click', _click);
 	}
 
 /* === Instance Methods === */
@@ -64,6 +66,13 @@ class ScrollBar extends Entity {
 		}
 	}
 
+	/**
+	  * handle clicks
+	  */
+	private function _click(event : MouseEvent):Void {
+
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the content rectangle */
@@ -72,19 +81,27 @@ class ScrollBar extends Entity {
 
 	/* the viewport rectangle */
 	public var viewport(get, never):Rectangle;
-	private inline function get_viewport():Rectangle return _vp;
+	private function get_viewport():Rectangle {
+		return new Rectangle(_vp.v.x, (_vp.v.y + scroll), _vp.v.w, _vp.v.h);
+	}
 
 	/* the scroll-position */
 	public var scroll(get, set):Float;
 	private inline function get_scroll():Float return _scroll.get();
 	private inline function set_scroll(v : Float):Float return _scroll.set( v );
 
+	/* the scroll-percentage */
+	public var scrollProgress(get, never):Percent;
+	private inline function get_scrollProgress():Percent {
+		return Percent.percent(scroll, (content.h - viewport.h));
+	}
+
 	/* the track-rect */
 	public var track(get, never):Rectangle;
 	private function get_track():Rectangle {
 		var w = 20;
 		var vp = viewport;
-		return new Rectangle((vp.x + vp.w - w), vp.y, w, vp.h);
+		return new Rectangle((vp.x + vp.w - w), _vp.v.y, w, vp.h);
 	}
 
 	/* the bar-rect */
@@ -92,12 +109,10 @@ class ScrollBar extends Entity {
 	private function get_bar():Rectangle {
 		var vp = viewport;
 		var cr = content;
+		var bh:Float = ((vp.h / cr.h) * vp.h);
+		var by:Float = scrollProgress.of(vp.h - bh);
 		var t = track;
-		var diff = (cr.h - vp.h);
-		var vpp = Percent.percent(vp.h, cr.h);
-		var bh = vpp.of( t.h );
-		var sp = Percent.percent(scroll, diff);
-		return new Rectangle(t.x, sp.of(t.h), t.w, bh);
+		return new Rectangle(t.x, by, t.w, bh);
 	}
 
 /* === Instance Fields === */
