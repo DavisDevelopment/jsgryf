@@ -7,6 +7,7 @@ import gryffin.display.TextAlign;
 import gryffin.display.Context.TextMetrics;
 
 import tannus.geom.*;
+import tannus.io.VoidSignal;
 import tannus.graphics.Color;
 
 import Math.*;
@@ -18,8 +19,11 @@ using tannus.math.TMath;
 class TextBox implements Paintable {
 	/* Constructor Function */
 	public function new():Void {
+		onStateChanged = new VoidSignal();
+		onTextChanged = new VoidSignal();
 		txt = '';
 		multiline = false;
+		wordWrap = null;
 		stateChanged = true;
 		canvas = new Canvas();
 		padding = 0;
@@ -39,7 +43,44 @@ class TextBox implements Paintable {
 	  * Paint [this] TextBox to a Canvas
 	  */
 	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
-		c.paint(toCanvas(), s, d);
+		if ( cache ) {
+			c.paint(toCanvas(), s, d);
+		}
+		else {
+			if ( multiline ) {
+				measure();
+				var w = round(textWidth + padding * 2);
+				var h = round(textHeight + padding * 2);
+
+				if (backgroundColor != null) {
+					c.fillStyle = backgroundColor.toString();
+					c.fillRect(d.x, d.y, w, h);
+				}
+
+				applyStyles( c );
+				var p:Point = new Point((d.x + padding), (d.y + padding));
+				for (line in lines()) {
+					c.fillText(line.text, p.x, p.y);
+					p.y += line.height;
+				}
+			}
+			else {
+				measure();
+				// resize the canvas to fit the text
+				var w = round(textWidth + padding * 2);
+				var h = round(textHeight + padding * 2);
+
+				/* draw the background, if any */
+				if (backgroundColor != null) {
+					c.fillStyle = backgroundColor.toString();
+					c.fillRect(d.x, d.y, w, h);
+				}
+
+				/* draw the text to the canvas */
+				applyStyles( c );
+				c.fillText(text, (d.x + padding), (d.y + padding));
+			}
+		}
 	}
 
 	/**
@@ -114,6 +155,31 @@ class TextBox implements Paintable {
 				}
 			}
 		}
+	}
+
+	/**
+	  * word wrap
+	  */
+	public function wrappedLines():Array<String> {
+		var lineWidth:Float = wordWrap;
+		var s = text.macbyteMap(_.isLineBreaking() ? 32 : _);
+		var allwords = s.split(' ');
+		var lines:Array<String> = new Array();
+		var line:Array<String> = new Array();
+
+		for (w in allwords) {
+			var testLine = line.concat([w]).join(' ');
+			var metrics = getMetrics( testLine );
+			if (metrics.width > lineWidth) {
+				lines.push(line.join(' '));
+				line = [w];
+			}
+			else {
+				line.push( w );
+			}
+		}
+
+		return lines;
 	}
 
 	/**
@@ -210,7 +276,7 @@ class TextBox implements Paintable {
 	  */
 	private function lines():Array<TextLine> {
 		multiline = false;
-		var slines = text.split('\n');
+		var slines:Array<String> = (wordWrap != null ? wrappedLines() : text.split('\n'));
 		var lines = new Array();
 		for (s in slines) {
 			var m = getMetrics( s );
@@ -224,6 +290,14 @@ class TextBox implements Paintable {
 		return lines;
 	}
 
+	/**
+	  * report a change in [this] TextBox's state
+	  */
+	private function changed():Void {
+		stateChanged = true;
+		onStateChanged.fire();
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the textual content of [this] TextBox */
@@ -231,7 +305,8 @@ class TextBox implements Paintable {
 	private function get_text():String return txt;
 	private function set_text(v : String):String {
 		if (v != txt) {
-			stateChanged = true;
+			changed();
+			onTextChanged.fire();
 		}
 		return (txt = v);
 	}
@@ -241,7 +316,7 @@ class TextBox implements Paintable {
 	private function get_padding():Float return _padding;
 	private function set_padding(v : Float):Float {
 		if (v != _padding) {
-			stateChanged = true;
+			changed();
 		}
 		return (_padding = v);
 	}
@@ -251,7 +326,7 @@ class TextBox implements Paintable {
 	private function get_fontFamily():String return _fontFamily;
 	private function set_fontFamily(v : String):String {
 		if (v != _fontFamily) {
-			stateChanged = true;
+			changed();
 		}
 		if (v.has(' '))
 			v = v.wrap('"');
@@ -263,7 +338,7 @@ class TextBox implements Paintable {
 	private function get_fontSize():Int return _fontSize;
 	private function set_fontSize(v : Int):Int {
 		if (v != _fontSize) {
-			stateChanged = true;
+			changed();
 		}
 		return (_fontSize = v);
 	}
@@ -275,7 +350,7 @@ class TextBox implements Paintable {
 	}
 	private function set_fontSizeUnit(v : String):String {
 		if (v != _fontSizeUnit) {
-			stateChanged = true;
+			changed();
 		}
 		return (_fontSizeUnit = v);
 	}
@@ -315,7 +390,7 @@ class TextBox implements Paintable {
 	private function get_color():Color return _color;
 	private function set_color(v : Color):Color {
 		if (v != _color) {
-			stateChanged = true;
+			changed();
 		}
 		return (_color = v);
 	}
@@ -325,7 +400,7 @@ class TextBox implements Paintable {
 	private function get_backgroundColor():Null<Color> return _backgroundColor;
 	private function set_backgroundColor(v : Null<Color>):Null<Color> {
 		if (v != _backgroundColor) {
-			stateChanged = true;
+			changed();
 		}
 		return (_backgroundColor = v);
 	}
@@ -335,7 +410,7 @@ class TextBox implements Paintable {
 	private function get_align():TextAlign return _align;
 	private function set_align(v : TextAlign):TextAlign {
 		if (v != _align) {
-			stateChanged = true;
+			changed();
 		}
 		return (_align = v);
 	}
@@ -345,7 +420,7 @@ class TextBox implements Paintable {
 	private function get_bold():Bool return _bold;
 	private function set_bold(v : Bool):Bool {
 		if (v != _bold) {
-			stateChanged = true;
+			changed();
 		}
 		return (_bold = v);
 	}
@@ -355,7 +430,7 @@ class TextBox implements Paintable {
 	private function get_italic():Bool return _italic;
 	private function set_italic(v : Bool):Bool {
 		if (v != _italic) {
-			stateChanged = true;
+			changed();
 		}
 		return (_italic = v);
 	}
@@ -375,6 +450,10 @@ class TextBox implements Paintable {
 	private var _bold:Bool;
 	private var _italic:Bool;
 	public var multiline:Bool;
+	public var wordWrap:Null<Float>;
+	public var cache:Bool = true;
+	public var onStateChanged:VoidSignal;
+	public var onTextChanged:VoidSignal;
 
 	private var _textWidth:Float;
 	private var _textHeight:Float;
