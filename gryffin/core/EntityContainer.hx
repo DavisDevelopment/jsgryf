@@ -30,12 +30,14 @@ class EntityContainer extends Entity implements Container {
 			if (stage != null) {
 				stage.registry[e.id] = e;
 				e.stage = stage;
+				calculateGeometry( stage.rect );
 				e.dispatch('activated', stage);
 			}
 			else {
 				on('activated', function(s : Stage) {
 					s.registry[e.id] = e;
 					e.stage = s;
+					calculateGeometry( s.rect );
 					e.dispatch('activated', s);
 				});
 			}
@@ -101,6 +103,17 @@ class EntityContainer extends Entity implements Container {
 			if (!e._hidden && shouldChildRender( e )) {
 				e.render(s, c);
 			}
+		}
+	}
+
+	/**
+	  * calculate [this] Entity's geometry
+	  */
+	override public function calculateGeometry(rect : Rectangle):Void {
+		super.calculateGeometry( rect );
+
+		for (e in getChildren()) {
+			e.calculateGeometry( rect );
 		}
 	}
 
