@@ -27,6 +27,13 @@ class Menu extends Entity {
 /* === Instance Methods === */
 
 	/**
+	  * initialize [this] Menu
+	  */
+	override public function init(stage : Stage):Void {
+		_listen();
+	}
+
+	/**
 	  * Create and append a new MenuItem
 	  */
 	public function item(options : Obj):MenuItem {
@@ -114,6 +121,27 @@ class Menu extends Entity {
 	}
 
 	/**
+	  * close all sub-menus
+	  */
+	public function closeAll():Void {
+		for (item in items) {
+			item.close();
+		}
+	}
+
+	/**
+	  * determine whether any sub-menu is currently open
+	  */
+	public function isAnyOpen():Bool {
+		for (i in items) {
+			if ( i.showChildren ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	  * Position the items in [this] menu
 	  */
 	public function positionItems(s : Stage):Void {
@@ -154,6 +182,14 @@ class Menu extends Entity {
 
 	override public function containsPoint(p : Point):Bool {
 		return rect.containsPoint( p );
+	}
+
+	private function _listen():Void {
+		stage.on('click', function(event) {
+			if (isAnyOpen() && !containsPoint( event.position )) {
+				closeAll();
+			}
+		});
 	}
 
 /* === Computed Instance Fields === */
