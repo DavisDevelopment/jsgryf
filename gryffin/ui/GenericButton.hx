@@ -25,6 +25,8 @@ class GenericButton extends Ent {
 		border = new Border();
 		hovered = false;
 		centerText = false;
+		minWidth = null;
+		minHeight = null;
 
 		fontFamily = 'Helvetica';
 		textColor = new Color(255, 255, 255);
@@ -45,7 +47,13 @@ class GenericButton extends Ent {
 	  */
 	override public function update(stage : Stage):Void {
 		w = ((border.width * 2) + padding.horizontal + box.width);
+		if (minWidth != null) {
+			w = max(w, minWidth);
+		}
 		h = ((border.width * 2) + padding.vertical + box.height);
+		if (minHeight != null) {
+			h = max(h, minHeight);
+		}
 
 		var mp = stage.getMousePosition();
 		hovered = (mp != null && containsPoint( mp ));
@@ -68,6 +76,12 @@ class GenericButton extends Ent {
 		c.fill();
 
 		/* draw the text */
+		var tx:Float = (x + border.width + padding.left);
+		var ty:Float = (y + border.width + padding.top);
+		if ( centerText ) {
+			var cw:Float = (w - (padding.horizontal + (border.width * 2)));
+			tx += ((cw - box.width) / 2);
+		}
 		c.drawComponent(box, 0, 0, box.width, box.height, (x + border.width + padding.left), (y + border.width + padding.top), box.width, box.height);
 
 		/* the the border */
@@ -124,6 +138,8 @@ class GenericButton extends Ent {
 
 	public var backgroundColor : Color;
 	public var centerText : Bool;
+	public var minWidth : Null<Float>;
+	public var minHeight : Null<Float>;
 
 	private var box : TextBox;
 	public var padding : Padding;
