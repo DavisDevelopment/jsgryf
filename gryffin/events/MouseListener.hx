@@ -48,6 +48,28 @@ class MouseListener implements EventCreator {
 
 			stage.mouseEvent( event );
 		});
+
+		for (n in ['dragover', 'dragenter', 'drop']) {
+			canvas.addEventListener(n, function(e) {
+				e.stopPropagation();
+				e.preventDefault();
+
+				if (e.type == 'drop') {
+					trace( e.dataTransfer );
+				}
+
+				dragEvent( e );
+
+				return false;
+			});
+		}
+	}
+
+	private function dragEvent(event : Dynamic):Void {
+		var ev = DragEvent.fromDOMEvent(cast event);
+		ev.position = findPos(cast event);
+		
+		stage.mouseEvent( ev );
 	}
 
 	/**
