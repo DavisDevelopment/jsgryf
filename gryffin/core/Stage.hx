@@ -63,6 +63,8 @@ class Stage extends EventDispatcher implements Container {
 			var event = new ResizeEvent(o, n);
 			dispatch('resize', event);
 		}
+
+		calculateGeometry();
 	}
 
 	/**
@@ -221,6 +223,16 @@ class Stage extends EventDispatcher implements Container {
 		/* if we're managing Animations */
 		if ( Animations.manager == this ) {
 			Animations.tick();
+		}
+	}
+
+	/**
+	  * Calculate geometry
+	  */
+	public function calculateGeometry():Void {
+		var vp = rect;
+		for (e in children) {
+			e.calculateGeometry( vp );
 		}
 	}
 
