@@ -143,6 +143,29 @@ class Pixels implements Paintable {
 		return new PixelsIterator( this );
 	}
 
+	/**
+	  * iterate over every [jump]th Pixel
+	  */
+	public function skim(jump : Int):PixelsIterator {
+		return new PixelsIterator(this, jump);
+	}
+
+	/**
+	  * get the averaged Color of [this] entire Pixel array
+	  */
+	public function getAverageColor():Color {
+		var c:Null<Color> = null;
+		for (pixel in this.skim( 25 )) {
+			if (c == null) {
+				c = pixel.color;
+			}
+			else {
+				c = c.mix(pixel.color, 50);
+			}
+		}
+		return c;
+	}
+
 /* === Computed Instance Fields === */
 
 	public var width(get, never):Int;
@@ -163,15 +186,25 @@ class Pixels implements Paintable {
 	private var pos : Point;
 }
 
+@:access( gryffin.display.Pixels )
 class PixelsIterator {
-	public inline function new(p : Pixels) {
+	public function new(p:Pixels, j:Int=1) {
 		src = p;
-		ii = (0...p.length);
+		i = 0;
+		step = j;
 	}
 
-	public inline function hasNext():Bool return ii.hasNext();
-	public inline function next():Pixel return src.ati(ii.next());
+	public function hasNext():Bool {
+		return (i < src.length);
+	}
+
+	public function next():Pixel {
+		var _i:Int = i;
+		i += step;
+		return src.ati( _i );
+	}
 
 	private var src : Pixels;
-	private var ii : IntIterator;
+	private var i : Int;
+	private var step : Int;
 }
