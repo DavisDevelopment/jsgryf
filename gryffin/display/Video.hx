@@ -290,6 +290,14 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	private inline function get_currentTime():Float return (vid.currentTime);
 	private inline function set_currentTime(v : Float):Float return (vid.currentTime = v);
 
+	/* the current time of [this] video (as a Duration) */
+	public var time(get, set):Duration;
+	private inline function get_time():Duration return Duration.fromSecondsF( currentTime );
+	private function set_time(v : Duration):Duration {
+		currentTime = v.totalSeconds;
+		return time;
+	}
+
 	/* the current 'progress' of [this] Video */
 	public var progress(get, set):Percent;
 	private inline function get_progress():Percent {
