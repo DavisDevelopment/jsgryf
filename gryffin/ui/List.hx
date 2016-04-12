@@ -16,6 +16,8 @@ class List <T : ListItem> extends EntityContainer {
 		super();
 
 		items = new Array();
+		cacheLayout = false;
+		altered = false;
 	}
 
 /* === Instance Methods === */
@@ -35,6 +37,7 @@ class List <T : ListItem> extends EntityContainer {
 			items.push( item );
 			addChild( item );
 			item.parent = this;
+			altered = true;
 			if (stage != null) {
 				stage.registry[item.id] = item;
 				item.stage = stage;
@@ -61,7 +64,9 @@ class List <T : ListItem> extends EntityContainer {
 	  * Remove an item from [this] List
 	  */
 	public function removeItem(item : T):Bool {
-		return items.remove( item );
+		var res = items.remove( item );
+		altered = true;
+		return res;
 	}
 
 	/**
@@ -94,10 +99,21 @@ class List <T : ListItem> extends EntityContainer {
 	}
 
 	/**
+	  * List-specific update
+	  * update the geometry of [this] List's items
+	  */
+	public function updateList(stage : Stage):Void {
+		positionItems( stage );
+	}
+
+	/**
 	  * update [this] List
 	  */
 	override public function update(stage : Stage):Void {
-		positionItems( stage );
+		if ( altered ) {
+			updateList( stage );
+			altered = false;
+		}
 
 		super.update( stage );
 	}
@@ -105,4 +121,7 @@ class List <T : ListItem> extends EntityContainer {
 /* === Instance Fields === */
 
 	public var items : Array<T>;
+	public var cacheLayout : Bool;
+	
+	private var altered : Bool;
 }

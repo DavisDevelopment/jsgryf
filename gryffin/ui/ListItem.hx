@@ -7,6 +7,7 @@ import gryffin.ui.*;
 import tannus.geom.*;
 import tannus.geom.Point;
 
+@:access( gryffin.ui.List )
 class ListItem extends Entity {
 	/* Constructor Function */
 	public function new():Void {
@@ -24,6 +25,34 @@ class ListItem extends Entity {
 	  */
 	override public function containsPoint(p : Point):Bool {
 		return rect.containsPoint( p );
+	}
+
+	/**
+	  * reflow the layout
+	  */
+	private function reflow():Void {
+		if (list != null) {
+			list.altered = true;
+		}
+	}
+
+	/**
+	  * update [this] ListItem, in response to it's containing List updating
+	  */
+	public function updateListItem(stage : Stage):Void {
+		null;
+	}
+
+	/**
+	  * update [this] ListItem
+	  */
+	override public function update(stage : Stage):Void {
+		super.update( stage );
+
+		if ( altered ) {
+			list.altered = true;
+			altered = false;
+		}
 	}
 
 /* === Computed Instance Fields === */
@@ -60,10 +89,17 @@ class ListItem extends Entity {
 		return new Rectangle(x, y, w, h);
 	}
 
+	/* the containing List */
+	public var list(get, never):Null<List<ListItem>>;
+	private inline function get_list():Null<List<ListItem>> {
+		return cast parentUntil(function(e) return Std.is(e, List));
+	}
+
 /* === Instance Fields === */
 
 	private var _x : Float;
 	private var _y : Float;
 	private var _w : Float;
 	private var _h : Float;
+	private var altered : Bool = false;
 }
