@@ -17,6 +17,7 @@ import gryffin.core.EventDispatcher;
 import gryffin.fx.Animations;
 
 import js.html.CanvasElement in Canvas;
+import gryffin.Tools.*;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -126,25 +127,34 @@ class Stage extends EventDispatcher implements Container {
 	  * Get a list of entities that reported themselves to overlap with the given coords
 	  */
 	public function getEntitiesAtPoint(p:Point, ?list:Array<Entity>):Array<Entity> {
+		/*
 		var res:Array<Entity> = new Array();
-		if (list == null)
+		if (list == null) {
 			list = children;
+		}
 		for (e in list) {
 			if (e.containsPoint( p )) {
 				res.push( e );
+				
 				if (Std.is(e, EntityContainer)) {
 					var c:EntityContainer = cast e;
-					res = res.concat(c.getEntitiesAtPoint( p ));
+					var cl = cast(e, EntityContainer).getEntitiesAtPoint( p );
+					trace( cl.length );
+					res = res.concat( cl );
 				}
 			}
 		}
 		return res;
+		*/
+		return walk().macfilter(_.containsPoint( p ));
 	}
+	public inline function getEntitiesAt(x:Float, y:Float):Array<Entity> return getEntitiesAtPoint(new Point(x, y));
 
 	/**
 	  * Get the 'first' Entity which reported itself to overlap with the given Point
 	  */
 	public function getEntityAtPoint(p : Point):Null<Entity> {
+		var start = now;
 		var target:Null<Entity> = null;
 		children.reverse();
 		for (e in children) {
@@ -160,7 +170,16 @@ class Stage extends EventDispatcher implements Container {
 			}
 		}
 		children.reverse();
+		var took = (now - start);
 		return target;
+		/*
+		var start = now;
+		var l = getEntitiesAtPoint( p );
+		trace( l );
+		var target = l.macmax( _.priority );
+		var took = (now - start);
+		return target;
+		*/
 	}
 	public function getEntityAt(x:Float, y:Float):Null<Entity> {
 		return getEntityAtPoint(new Point(x, y));
@@ -186,7 +205,7 @@ class Stage extends EventDispatcher implements Container {
 		}
 
 		/* reset the cursor to the default (arrow) */
-		cursor = 'default';
+		// cursor = 'default';
 
 		/* remove those Entities which have been marked for deletion */
 		var filtr = children.splitfilter(function(e) return !e.destroyed);
@@ -239,22 +258,22 @@ class Stage extends EventDispatcher implements Container {
 	/**
 	  * Walk [children], getting child-nodes of Containers as well
 	  */
-	private function walk(?childList:Array<Entity>, ?ignore:Entity->Bool):Array<Entity> {
-		if (childList == null)
-			childList = children;
-		var results:Array<Entity> = childList;
-		
-		for (child in childList) {
-			if (ignore != null && ignore(child)) {
+	private function walk(?list:Array<Entity>, ?ignore:Entity->Bool):Array<Entity> {
+		if (list == null) {
+			list = children;
+		}
+		var res:Array<Entity> = new Array();
+		for (ent in list) {
+			if (ignore != null && ignore( ent )) {
 				continue;
 			}
-			if (Std.is(child, EntityContainer)) {
-				var container:EntityContainer = cast child;
-				results = results.concat(walk(container.getChildren()));
+			else {
+				res.push( ent );
+				res = res.concat(walk(ent.getChildren(), ignore));
 			}
 		}
 
-		return results;
+		return res;
 	}
 
 	/**
