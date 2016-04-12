@@ -187,6 +187,11 @@ class Entity extends EventDispatcher {
 		effects.remove( e );
 	}
 
+	/* get the child-Entities of [this] One */
+	public function getChildren():Array<Entity> {
+		return new Array();
+	}
+
 	/**
 	  * get the nearest [parent] for whom [test] returns `true`
 	  */
