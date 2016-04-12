@@ -28,6 +28,11 @@ class ContextMenuItem extends ListItem {
 
 /* === Instance Methods === */
 
+	/* initialize [this] */
+	override public function init(stage : Stage):Void {
+		super.init( stage );
+	}
+
 	/**
 	  * update [this] item
 	  */
@@ -49,6 +54,7 @@ class ContextMenuItem extends ListItem {
 		}
 
 		box.text = button.text;
+		altered = box.hasStateChanged();
 	}
 
 	/**
