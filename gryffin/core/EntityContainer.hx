@@ -56,7 +56,7 @@ class EntityContainer extends Entity implements Container {
 	  * default behavior is to just return [children], but sub-classes can 
 	  * override this
 	  */
-	public function getChildren():Array<Entity> {
+	override public function getChildren():Array<Entity> {
 		return children.filter( isValidChild );
 	}
 
@@ -125,6 +125,7 @@ class EntityContainer extends Entity implements Container {
 		for (e in getChildren()) {
 			if (e.containsPoint( p )) {
 				res.push( e );
+				
 				if (Std.is(e, EntityContainer)) {
 					var c:EntityContainer = cast e;
 					res = res.concat(c.getEntitiesAtPoint( p ));
