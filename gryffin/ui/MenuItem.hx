@@ -166,6 +166,7 @@ class MenuItem extends EventDispatcher {
 			else if (_hovered && !hovered) {
 				hoverStart = null;
 				beenHovered = 0;
+				stage.cursor = 'default';
 			}
 		}
 
@@ -283,13 +284,11 @@ class MenuItem extends EventDispatcher {
 	private function listen(s : Stage):Void {
 		var lastEvent:Null<MouseEvent> = null;
 		s.on('click', function(e : MouseEvent) {
-			if (e == lastEvent)
-				trace('click handler is bound multiple times');
-			var crect = new Rectangle(x, y, (child?parent.panelWidth:w), h);
-			if (child && parent.showChildren && crect.containsPoint(e.position)) {
+			var crect = new Rectangle(x, y, (child ? parent.panelWidth : w), h);
+			if (child && parent.showChildren && crect.containsPoint( e.position )) {
 				click( e );
 			}
-			else if (!child && crect.containsPoint(e.position)) {
+			else if (!child && crect.containsPoint( e.position )) {
 				click( e );
 			}
 			lastEvent = e;
