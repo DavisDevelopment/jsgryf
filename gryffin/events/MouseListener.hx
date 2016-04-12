@@ -66,7 +66,8 @@ class MouseListener implements EventCreator {
 	}
 
 	private function dragEvent(event : Dynamic):Void {
-		var ev = DragEvent.fromDOMEvent(cast event);
+		//var ev = DragEvent.fromDOMEvent(cast event);
+		var ev = MouseEvent.fromJsEvent(cast event);
 		ev.position = findPos(cast event);
 		
 		stage.mouseEvent( ev );
