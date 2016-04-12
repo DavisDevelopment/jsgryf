@@ -291,6 +291,11 @@ class TextBox implements Paintable {
 	}
 
 	/**
+	  * query whether [this] TextBox's state has changed
+	  */
+	public inline function hasStateChanged():Bool return stateChanged;
+
+	/**
 	  * report a change in [this] TextBox's state
 	  */
 	private function changed():Void {
