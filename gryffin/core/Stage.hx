@@ -12,11 +12,12 @@ import tannus.nore.Selector;
 
 import gryffin.events.*;
 import gryffin.display.Ctx;
+import gryffin.display.Canvas;
 import gryffin.core.Entity;
 import gryffin.core.EventDispatcher;
 import gryffin.fx.Animations;
 
-import js.html.CanvasElement in Canvas;
+import js.html.CanvasElement in NativeCanvas;
 import gryffin.Tools.*;
 
 using Lambda;
@@ -26,11 +27,10 @@ using tannus.math.TMath;
 @:access( gryffin.display.Canvas )
 class Stage extends EventDispatcher implements Container {
 	/* Constructor Function */
-	public function new(can : Canvas):Void {
+	public function new(can : NativeCanvas):Void {
 		super();
 
-		canvas = can;
-		ctx = canvas.getContext2d();
+		canvas = new Canvas( can );
 		children = new Array();
 		registry = new Map();
 		styles = new GlobalStyles( this );
@@ -49,6 +49,14 @@ class Stage extends EventDispatcher implements Container {
 /* === Instance Methods === */
 
 	/**
+	  * Re-attach [this] Stage to another Canvas
+	  */
+	public function attach(can : NativeCanvas):Void {
+		canvas = new Canvas( can );
+		mouseManager.rebind();
+	}
+
+	/**
 	  * Resize [this] Stage
 	  */
 	public function resize(w:Int, h:Int):Void {
@@ -56,7 +64,6 @@ class Stage extends EventDispatcher implements Container {
 		var _h:Int = height;
 		canvas.width = w;
 		canvas.height = h;
-		ctx = canvas.getContext2d();
 		
 		if (!(width == _w && height == _h)) {
 			var o = new Area(_w, _h);
@@ -310,11 +317,36 @@ class Stage extends EventDispatcher implements Container {
 	  * Handle a MouseEvent
 	  */
 	private function mouseEvent(e : MouseEvent):Void {
+		// dispatch the event on [this] Stage
 		dispatch(e.type, e);
 
-		var target:Null<Entity> = getEntityAtPoint(e.position);
-		if (target != null && !(target.isHidden()||target.isCached()||target.destroyed)) {
-			target.dispatch(e.type, e);
+		/* if the event has been cancelled, or has ceased propogation */
+		if (e.cancelled || e.propogationStopped) {
+			return ;
+		}
+
+		var finalTarget:Null<Entity> = getEntityAtPoint( e.position );
+		if (finalTarget != null && !(finalTarget.isHidden() || finalTarget.isCached() || finalTarget.destroyed)) {
+			var eventPath:Array<Entity> = new Array();
+			var currentTarget:Entity = finalTarget;
+			eventPath.unshift( currentTarget );
+
+			while (currentTarget.parent != null) {
+				currentTarget = currentTarget.parent;
+				eventPath.unshift( currentTarget );
+			}
+
+			// traverse the event-path
+			for (target in eventPath) {
+				// dispatch the event on the current target
+				target.dispatch(e.type, e);
+
+				/* if the event has been cancelled, or has ceased propogation */
+				if (e.cancelled || e.propogationStopped) {
+					// stop traversal
+					break;
+				}
+			}
 		}
 	}
 
@@ -373,16 +405,19 @@ class Stage extends EventDispatcher implements Container {
 	/* the cursor for [this] Stage */
 	public var cursor(get, set):String;
 	private function get_cursor():String {
-		return canvas.style.cursor;
+		return canvas.canvas.style.cursor;
 	}
 	private function set_cursor(v : String):String {
-		return (canvas.style.cursor = v);
+		return (canvas.canvas.style.cursor = v);
 	}
+
+	/* the Draing Context for [this] Stage */
+	public var ctx(get, never):Ctx;
+	private inline function get_ctx():Ctx return canvas.context;
 
 /* === Instance Fields === */
 
 	public var canvas : Canvas;
-	public var ctx : Ctx;
 	public var children : Array<Entity>;
 	public var registry : Map<String, Entity>;
 	public var noclear : Bool = false;
