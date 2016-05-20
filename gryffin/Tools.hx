@@ -23,8 +23,8 @@ class Tools {
 	/**
 	  * Wait [ms] milliseconds, then invoke [action]
 	  */
-	public static inline function wait(ms:Int, action:Void->Void):Void {
-		win.setTimeout(action, ms);
+	public static inline function wait(ms:Int, action:Void->Void):Int {
+		return win.setTimeout(action, ms);
 	}
 
 	/**
