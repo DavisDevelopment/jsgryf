@@ -13,12 +13,13 @@ import js.html.CanvasElement in Canvas;
 import js.html.MouseEvent in JMEvent;
 import js.html.WheelEvent in JWEvent;
 
-@:access(gryffin.core.Stage)
+@:access( gryffin.core.Stage )
+@:access( gryffin.display.Canvas )
 class MouseListener implements EventCreator {
 	/* Constructor Function */
 	public function new(s : Stage):Void {
 		stage = s;
-		canvas = stage.canvas;
+		relevant = ['click', 'mouseup', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'contextmenu', 'mousewheel'];
 
 		bind();
 	}
@@ -29,40 +30,14 @@ class MouseListener implements EventCreator {
 	  * Listen for events on the thing
 	  */
 	private function bindMouse():Void {
-		var relevant = ['click', 'mouseup', 'mousedown', 'mouseenter', 'mouseleave'];
+		var relevant = this.relevant.slice(0, 4);
+		trace( relevant );
 		for (name in relevant) {
 			canvas.addEventListener(name, handle);
 		}
 		canvas.addEventListener('mousemove', handleMove);
 
-		canvas.addEventListener('contextmenu', function(e : JMEvent) {
-			var event:MouseEvent = new MouseEvent(e.type, findPos(e), e.button, findMods(e));
-			
-			function prevent():Void {
-				e.preventDefault();
-			}
-			
-			event.onCancelled.once( prevent );
-			event.onDefaultPrevented.once( prevent );
-			event.onPropogationStopped.once( prevent );
-
-			stage.mouseEvent( event );
-		});
-
-		for (n in ['dragover', 'dragenter', 'drop']) {
-			canvas.addEventListener(n, function(e) {
-				e.stopPropagation();
-				e.preventDefault();
-
-				if (e.type == 'drop') {
-					trace( e.dataTransfer );
-				}
-
-				dragEvent( e );
-
-				return false;
-			});
-		}
+		canvas.addEventListener('contextmenu', handleMenu);
 	}
 
 	private function dragEvent(event : Dynamic):Void {
@@ -81,11 +56,48 @@ class MouseListener implements EventCreator {
 	}
 
 	/**
+	  * Handle ContextMenu Event
+	  */
+	private function handleMenu(e : JMEvent):Void {
+		var event:MouseEvent = new MouseEvent(e.type, findPos( e ), e.button, findMods( e ));
+
+		function prevent():Void {
+			e.preventDefault();
+		}
+
+		event.onCancelled.once( prevent );
+		event.onDefaultPrevented.once( prevent );
+		event.onPropogationStopped.once( prevent );
+
+		stage.mouseEvent( event );
+	}
+
+	/**
 	  * Listen for events
 	  */
 	private function bind():Void {
 		bindMouse();
 		bindWheel();
+	}
+
+	/**
+	  * Stop listening for events
+	  */
+	public function unbind():Void {
+		for (name in relevant) {
+			canvas.removeEventListener(name, handle);
+		}
+		canvas.removeEventListener('mousemove', handleMove);
+		canvas.removeEventListener('contextmenu', handleMenu);
+		canvas.removeEventListener('mousewheel', handleWheel);
+	}
+
+	/**
+	  * Rebind events
+	  */
+	public function rebind():Void {
+		unbind();
+		bind();
 	}
 
 	/**
@@ -106,14 +118,14 @@ class MouseListener implements EventCreator {
 	  */
 	private function findMods(e : JMEvent):Array<EventMod> {
 		var mods:Array<EventMod> = new Array();
-		if (e.altKey)
-			mods.push(Alt);
-		if (e.ctrlKey)
-			mods.push(Control);
-		if (e.shiftKey)
-			mods.push(Shift);
-		if (e.metaKey)
-			mods.push(Meta);
+		if ( e.altKey )
+			mods.push( Alt );
+		if ( e.ctrlKey )
+			mods.push( Control );
+		if ( e.shiftKey )
+			mods.push( Shift );
+		if ( e.metaKey )
+			mods.push( Meta );
 		return mods;
 	}
 
@@ -191,8 +203,14 @@ class MouseListener implements EventCreator {
 		stage.dispatch('scroll', event);
 	}
 
+/* === Computed Instance Fields === */
+
+	/* the Canvas Element itself */
+	private var canvas(get, never):Canvas;
+	private inline function get_canvas():Canvas return stage.canvas.canvas;
+
 /* === Instance Fields === */
 
 	public var stage : Stage;
-	public var canvas : Canvas;
+	private var relevant : Array<String>;
 }
