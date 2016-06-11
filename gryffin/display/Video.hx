@@ -11,9 +11,9 @@ import tannus.io.VoidSignal in VSignal;
 import tannus.ds.Delta;
 import tannus.ds.AsyncStack;
 import tannus.ds.AsyncPool;
-import tannus.ds.Promise;
-import tannus.ds.Stateful;
+import tannus.ds.Promise; import tannus.ds.Stateful;
 import tannus.ds.promises.*;
+import tannus.math.Ratio;
 
 import tannus.media.*;
 import Math.*;
@@ -332,6 +332,11 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	public var muted(get, set):Bool;
 	private inline function get_muted() return vid.muted;
 	private inline function set_muted(v : Bool) return (vid.muted = v);
+
+	public var aspectRatio(get, never):Ratio;
+	private inline function get_aspectRatio():Ratio {
+		return new Ratio(vid.videoWidth, vid.videoHeight);
+	}
 
 /* === Instance Fields === */
 
