@@ -53,7 +53,7 @@ class MenuItem extends EventDispatcher {
 			handleOptions( options );
 		}
 
-		on('open', function(x) trace('opening $label'));
+		//on('open', function(x) trace('opening $label'));
 	}
 
 /* === Instance Methods === */
@@ -186,6 +186,14 @@ class MenuItem extends EventDispatcher {
 				null;
 			}
 		}
+	}
+
+	/**
+	  * ([this] MenuItem has just been (possibly indirectly) attached to a Menu)
+	  * initialize [this] MenuItem on the Menu
+	  */
+	public function init(m : Menu):Void {
+		null;
 	}
 
 	/**
@@ -452,9 +460,26 @@ class MenuItem extends EventDispatcher {
 		return (showChildren = v);
 	}
 
+	private function set_root(v : Null<Menu>):Null<Menu> {
+		var l = root;
+		root = v;
+		switch ([l, root]) {
+			case [null, r]:
+				init( root );
+				items.each(_.root = r);
+			case [r, null]:
+				items.each(_.root = null);
+			case [oldRoot, newRoot] if (oldRoot != newRoot && oldRoot != null && newRoot != null):
+				init( root );
+				items.each(_.root = newRoot);
+			default: null;
+		}
+		return root;
+	}
+
 /* === Instance Fields === */
 
-	public var root : Menu;
+	public var root(default, set): Null<Menu>;
 	public var parent : Null<MenuItem>;
 	public var items : Array<MenuItem>;
 
