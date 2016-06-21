@@ -70,7 +70,21 @@ class ScrollBar extends Entity {
 	  * handle clicks
 	  */
 	private function _click(event : MouseEvent):Void {
+		/* if the track was clicked */
+		if (track.containsPoint( event.position )) {
+			var mp = pointPercent( event.position );
+			var mx = (content.h - viewport.h);
+			scroll = min(mx, mp.of( mx ));
+		}
+	}
 
+	/**
+	  * get a Percent from a Point
+	  */
+	private function pointPercent(p : Point):Percent {
+		var t = track;
+		var y = (p.y - t.y);
+		return Percent.percent(y, t.h);
 	}
 
 /* === Computed Instance Fields === */

@@ -9,9 +9,9 @@ import tannus.graphics.Color;
 import tannus.ds.Obj;
 import tannus.events.MouseEvent;
 import tannus.math.TMath.*;
+import gryffin.Tools.*;
 
 import Reflect.*;
-import gryffin.Tools.defer;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -150,30 +150,26 @@ class MenuItem extends EventDispatcher {
 		// check whether the mouse cursor is currently inside of [this] item
 		var mouse =  stage.getMousePosition();
 		var crect = new Rectangle(x, y, (child?parent.panelWidth:w), (h + padding.vertical));
-		if (mouse != null) {
-			hovered = crect.containsPoint(mouse);
-			/* hover is continuing */
-			if (_hovered && hovered) {
-				var now = (Date.now().getTime());
-				beenHovered = (now - hoverStart);
-			}
-			/* hover has begun */
-			else if (!_hovered && hovered) {
-				hoverStart = (Date.now().getTime());
-			}
+		hovered = (mouse != null && crect.containsPoint( mouse ));
 
-			/* hover has ended */
-			else if (_hovered && !hovered) {
-				hoverStart = null;
-				beenHovered = 0;
-				stage.cursor = 'default';
+		if ( hovered ) {
+			if ( !awaitingHoverIntent ) {
+				wait(1000, function() {
+					if (hovered && !items.empty()) {
+						open();
+					}
+
+					awaitingHoverIntent = false;
+				});
 			}
 		}
 
 		// if we're being hovered over, indicate that [this] can be clicked
+		/*
 		if ( hovered ) {
 			stage.cursor = 'pointer';
 		}
+		*/
 
 		// reposition [this]'s children is they're to be rendered
 		if (subMenu && showChildren) {
@@ -287,6 +283,13 @@ class MenuItem extends EventDispatcher {
 	}
 
 	/**
+	  * Check whether the given Point lies inside of [this] Item
+	  */
+	public inline function containsPoint(p : Point):Bool {
+		return new Rectangle(x, y, (child ? parent.panelWidth : w), h).containsPoint( p );
+	}
+
+	/**
 	  * Listen for events on the Stage
 	  */
 	private function listen(s : Stage):Void {
@@ -375,6 +378,23 @@ class MenuItem extends EventDispatcher {
 		}
 		p.save();
 		checkIcon = Image.load(c.dataURI());
+	}
+
+	/**
+	  * Check whether the given Point lies inside of [this] or any of it's children
+	  */
+	public function hierarchyContainsPoint(p : Point):Bool {
+		if (containsPoint( p )) {
+			return true;
+		}
+		else {
+			for (i in items) {
+				if (i.hierarchyContainsPoint( p )) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 /* === Computed Instance Fields === */
@@ -501,5 +521,6 @@ class MenuItem extends EventDispatcher {
 	private var beenHovered : Float;
 	private var checkIcon : Null<Image>;
 	private var options : Null<Obj>;
+	private var awaitingHoverIntent : Bool = false;
 	public var padding : Padding;
 }

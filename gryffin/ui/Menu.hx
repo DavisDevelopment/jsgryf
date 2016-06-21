@@ -186,7 +186,12 @@ class Menu extends Entity {
 
 	private function _listen():Void {
 		stage.on('click', function(event) {
-			if (isAnyOpen() && !containsPoint( event.position )) {
+			if (!containsPoint( event.position )) {
+				for (item in items) {
+					if (item.hierarchyContainsPoint( event.position )) {
+						return ;
+					}
+				}
 				closeAll();
 			}
 		});
