@@ -17,7 +17,8 @@ class FrameManager {
 	  * Fuction fired each frame
 	  */
 	private function _frame(delta : Float):Void {
-		frame.call( delta );
+		if ( !paused )
+			frame.call( delta );
 		queueNext();
 	}
 
@@ -42,8 +43,28 @@ class FrameManager {
 		window.cancelAnimationFrame( id );
 	}
 
+	/**
+	  * Pause [this] Loop
+	  */
+	public function pause():Void {
+		_paused = true;
+	}
+
+	/**
+	  * Resume [this] Loop
+	  */
+	public function resume():Void {
+		_paused = false;
+	}
+
+/* === Computed Instance Fields === */
+
+	public var paused(get, never):Bool;
+	private inline function get_paused():Bool return _paused;
+
 /* === Instance Fields === */
 
 	public var frame : Signal<Float>;
 	private var id : Int;
+	private var _paused : Bool = false;
 }
