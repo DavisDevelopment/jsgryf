@@ -374,6 +374,12 @@ class Stage extends EventDispatcher implements Container {
 		eventTimes.set(name, Date.now().getTime());
 	}
 
+	/**
+	  * Pause [this] Stage
+	  */
+	public inline function pause():Void manager.pause();
+	public inline function resume():Void manager.resume();
+
 /* === Computed Instance Fields === */
 
 	/* the width of [this] Stage */
@@ -415,6 +421,9 @@ class Stage extends EventDispatcher implements Container {
 	public var ctx(get, never):Ctx;
 	private inline function get_ctx():Ctx return canvas.context;
 
+	public var paused(get, never):Bool;
+	private inline function get_paused():Bool return manager.paused;
+
 /* === Instance Fields === */
 
 	public var canvas : Canvas;
@@ -430,7 +439,7 @@ class Stage extends EventDispatcher implements Container {
 
 	/* dictates whether or not to scale the Canvas to fit the window */
 	private var _fill : Bool;
-	
+
 	/* the last known dimensions of the Window */
 	private var lastWindowSize : Rectangle;
 	private var eventTimes : Map<String, Float>;
