@@ -12,7 +12,7 @@ class MouseWatcher {
 	/* Constructor Function */
 	public function new(s : Stage):Void {
 		stage = s;
-		lastMousePos = null;
+		lastMouseEvent = null;
 		lastMove = -1;
 		hovered = new List();
 
@@ -36,35 +36,26 @@ class MouseWatcher {
 	}
 
 	/**
+	  * get the last MouseEvent
+	  */
+	public function getLastEvent():Null<MouseEvent> {
+		return lastMouseEvent;
+	}
+
+	/**
 	  * Register event handlers
 	  */
 	private function _listen():Void {
-		stage.on('mousemove', onmove);
-		stage.on('mouseleave', onleave);
+		stage.on('mousemove', handle);
+		stage.on('mouseleave', handle);
 	}
 
 	/**
 	  * Handle the mousemove event
 	  */
-	private function onmove(e : MouseEvent):Void {
-		lastMousePos = e.position;
+	private function handle(e : MouseEvent):Void {
+		lastMouseEvent = e;
 		lastMove = e.date;
-
-		/*
-		var ents = stage.getEntitiesAtPoint( e.position );
-		trace( ents );
-		for (ent in ents) {
-			mouseInEnt(ent, e);
-		}
-		hoveredEntities( e );
-		*/
-	}
-
-	/**
-	  * handle the mouseleave event
-	  */
-	private function onleave(e : MouseEvent):Void {
-		lastMousePos = null;
 	}
 
 	/**
@@ -116,9 +107,27 @@ class MouseWatcher {
 		}
 	}
 
+/* === Computed Instance Fields === */
+
+	private var lastMousePos(get, never):Null<Point>;
+	private function get_lastMousePos():Null<Point> {
+		if (lastMouseEvent == null) {
+			return null;
+		}
+		else {
+			var e = lastMouseEvent;
+			switch ( e.type ) {
+				case 'mouseleave':
+					return null;
+				default:
+					return e.position;
+			}
+		}
+	}
+
 /* === Instance Fields === */
 
-	private var lastMousePos : Null<Point>;
+	private var lastMouseEvent : Null<MouseEvent>;
 	private var lastMove : Float;
 	private var hovered : List<Entity>;
 
