@@ -1,4 +1,4 @@
-package gryffin.display;
+package gryffin.audio;
 
 import gryffin.core.Stage;
 import gryffin.core.EventDispatcher;
@@ -22,17 +22,18 @@ import gryffin.Tools.*;
 
 import tannus.http.Url;
 
-import js.html.VideoElement in Vid;
+import js.html.AudioElement in Audel;
+import js.html.Audio in Aud;
 import js.html.MediaError;
 
 using tannus.math.TMath;
 
-class Video extends EventDispatcher implements Paintable implements Stateful<VideoState> implements gryffin.media.MediaObject {
+class Audio extends EventDispatcher implements Stateful<AudioState> implements gryffin.media.MediaObject {
 	/* Constructor Function */
-	public function new(?el : Vid):Void {
+	public function new(?s : Aud):Void {
 		super();
 
-		vid = (el != null ? el : createVid());
+		sound = (s != null ? s : cast createSound());
 
 		onerror = new Signal();
 		ondurationchange = new Signal();
@@ -57,102 +58,14 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	  * Destroy [this] Video
 	  */
 	public function destroy():Void {
-		vid.remove();
-	}
-
-	/**
-	  * Paint [this] Video onto a Canvas
-	  */
-	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
-		if ( ready ) {
-			c.drawImage(vid, s.x, s.y, s.w, s.h, d.x, d.y, d.w, d.h);
-		}
-		else {
-			c.save();
-			c.beginPath();
-			c.fillStyle = 'black';
-			c.drawRect( d );
-			c.closePath();
-			c.fill();
-			c.restore();
-		}
-	}
-
-	/**
-	  * Capture [this] Video onto a Canvas
-	  */
-	public function capture(x:Int=0, y:Int=0, ?w:Int, ?h:Int):Canvas {
-		if (w == null)
-			w = (width - x);
-		if (h == null)
-			h = (height - y);
-		var canvas:Canvas = Canvas.create(w, h);
-		canvas.context.drawImage(vid, x, y, width, height, 0, 0, w, h);
-		return canvas;
-	}
-
-	/**
-	  * Get 'all' frames of [this] Video
-	  */
-	public function frames(jumpSeconds:Int, oncapture:Int -> Canvas -> Void):ArrayPromise<Canvas> {
-		return Promise.create({
-			var stack = new AsyncStack();
-			var results = new Array();
-			var i:Int = 0;
-			var len:Int = duration.totalSeconds;
-			while (i < len) {
-				stack.push(function( next ) {
-					get_frame(i.clamp(0, len), results, function( canvas ) {
-						oncapture(i, canvas);
-						next();
-					});
-				});
-
-				i += jumpSeconds;
-			}
-			stack.run(function() return results);
-		}).array();
-	}
-
-	private function get_frame(n:Int, list:Array<Canvas>, done:Canvas->Void):Void {
-		defer(function() {
-			currentTime = n;
-			oncanplay.once(function() {
-				var c = capture();
-				list.push( c );
-				done( c );
-			});
-		});
-	}
-
-	/**
-	  * get the approximate number of frames in [this] Video
-	  */
-	public function frameCount():Int {
-		return (duration.totalSeconds * FPS);
-	}
-
-	/**
-	  * get the index of the current frame
-	  */
-	public function currentFrame():Int {
-		var ct:Duration = currentTime;
-		return (ct.totalSeconds * FPS);
-	}
-
-	/**
-	  * jump to the given frame
-	  */
-	public function gotoFrame(frameIndex : Int):Void {
-		var frameTime:Float = (1.0 / FPS);
-		currentTime = (frameIndex * frameTime);
+		sound.remove();
 	}
 
 	/**
 	  * Play [this] Video
 	  */
 	public function play():Void {
-		vid.play();
+		sound.play();
 		dispatch('play', null);
 	}
 
@@ -160,7 +73,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	  * Pause [this] Video
 	  */
 	public function pause():Void {
-		vid.pause();
+		sound.pause();
 		dispatch('pause', null);
 	}
 
@@ -173,13 +86,13 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		src = url;
 
 		onloadedmetadata.once(function() {
-			trace( 'video\'s metadata has been loaded' );
+			trace( 'soundeo\'s metadata has been loaded' );
 			if (can_manipulate != null) {
 				can_manipulate();
 			}
 		});
 		oncanplay.once(function() {
-			trace('video can be played now');
+			trace('soundeo can be played now');
 			if (can_play != null) {
 				can_play();
 			}
@@ -192,7 +105,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/**
 	  * Get a copy of the current state of [this] Video
 	  */
-	public function getState():VideoState {
+	public function getState():AudioState {
 		return {
 			'volume': volume,
 			'speed': playbackRate
@@ -202,7 +115,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/**
 	  * Set the current state of [this] Video
 	  */
-	public function setState(state : VideoState):Void {
+	public function setState(state : AudioState):Void {
 		volume = state.volume;
 		playbackRate = state.speed;
 	}
@@ -211,9 +124,9 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	  * Bind the Signal fields of [this] Video to the underlying events
 	  */
 	private function listen():Void {
-		var on = vid.addEventListener.bind(_, _);
+		var on = sound.addEventListener.bind(_, _);
 
-		on('error', function() onerror.call( vid.error ));
+		on('error', function() onerror.call( sound.error ));
 		on('ended', onended.fire);
 		on('canplay', oncanplay.fire);
 		on('play', onplay.fire);
@@ -232,8 +145,8 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/* listen to the 'durationchange' Event */
 	private function durationChanged():Void {
 		var last_duration:Null<Duration> = null;
-		vid.addEventListener('durationchange', function() {
-			var cur_dur:Duration = Duration.fromSecondsF( vid.duration );
+		sound.addEventListener('durationchange', function() {
+			var cur_dur:Duration = Duration.fromSecondsF( sound.duration );
 			var delta:Delta<Duration> = new Delta(cur_dur, last_duration);
 
 			ondurationchange.call( delta );
@@ -245,7 +158,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/* listen for the 'volumechange' Event */
 	private function volumeChanged():Void {
 		var last_vol:Null<Float> = volume;
-		vid.addEventListener('volumechange', function() {
+		sound.addEventListener('volumechange', function() {
 			var delta = new Delta(volume, last_vol);
 			onvolumechange.call( delta );
 			onstatechange.call(getState());
@@ -257,7 +170,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/* listen for the 'ratechange' Event */
 	private function rateChanged():Void {
 		var last_rate:Null<Float> = playbackRate;
-		vid.addEventListener('ratechange', function() {
+		sound.addEventListener('ratechange', function() {
 			var delta = new Delta(playbackRate, last_rate);
 			onratechange.call( delta );
 			onstatechange.call(getState());
@@ -268,44 +181,26 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 
 /* === Computed Instance Fields === */
 
-	/* the width of [this] Video */
-	public var width(get, never):Int;
-	private inline function get_width():Int return (vid.videoWidth);
-	
-	/* the height of [this] Video */
-	public var height(get, never):Int;
-	private inline function get_height():Int return (vid.videoHeight);
-
-	/* the rect of [this] Video */
-	public var rect(get, never):Rectangle;
-	private function get_rect():Rectangle {
-		return new Rectangle(0, 0, width, height);
-	}
-
 	/* the [src] attribute of [this] Video */
 	public var src(get, set):String;
 	private function get_src():String {
-		return Std.string(vid.currentSrc);
+		return Std.string(sound.currentSrc);
 	}
 	private function set_src(v : String):String {
-		vid.src = v.toString();
-		ready = false;
-		onloadedmetadata.once(function() {
-			ready = true;
-		});
+		sound.src = v.toString();
 		return src;
 	}
 
 	/* the duration of [this] Video */
 	public var duration(get, never):Duration;
-	private inline function get_duration():Duration return Duration.fromSecondsF(vid.duration);
+	private inline function get_duration():Duration return Duration.fromSecondsF(sound.duration);
 
 	/* the current time of [this] Video */
 	public var currentTime(get, set):Float;
-	private inline function get_currentTime():Float return (vid.currentTime);
-	private inline function set_currentTime(v : Float):Float return (vid.currentTime = v);
+	private inline function get_currentTime():Float return (sound.currentTime);
+	private inline function set_currentTime(v : Float):Float return (sound.currentTime = v);
 
-	/* the current time of [this] video (as a Duration) */
+	/* the current time of [this] soundeo (as a Duration) */
 	public var time(get, set):Duration;
 	private inline function get_time():Duration return Duration.fromSecondsF( currentTime );
 	private function set_time(v : Duration):Duration {
@@ -316,52 +211,47 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/* the current 'progress' of [this] Video */
 	public var progress(get, set):Percent;
 	private inline function get_progress():Percent {
-		return Percent.percent(currentTime, vid.duration);
+		return Percent.percent(currentTime, sound.duration);
 	}
 	private function set_progress(v : Percent):Percent {
-		currentTime = v.of( vid.duration );
+		currentTime = v.of( sound.duration );
 		return progress;
 	}
 
 	/* the playbackRate of [this] Video */
 	public var playbackRate(get, set):Float;
-	private inline function get_playbackRate():Float return (vid.playbackRate);
+	private inline function get_playbackRate():Float return (sound.playbackRate);
 	private function set_playbackRate(v : Float):Float {
-		vid.playbackRate = v;
-		vid.playbackRate = (round(vid.playbackRate * 100) / 100);
-		return vid.playbackRate;
+		sound.playbackRate = v;
+		sound.playbackRate = (round(sound.playbackRate * 100) / 100);
+		return sound.playbackRate;
 	}
 
 	/* whether [this] Video is currently paused */
 	public var paused(get, never):Bool;
-	private inline function get_paused():Bool return vid.paused;
+	private inline function get_paused():Bool return sound.paused;
 
 	/* the volume of [this] Video */
 	public var volume(get, set):Float;
-	private inline function get_volume() return vid.volume;
+	private inline function get_volume() return sound.volume;
 	private function set_volume(v : Float):Float {
-		return (vid.volume = v.clamp(0, 1));
+		return (sound.volume = v.clamp(0, 1));
 	}
 
 	/* whether [this] Video is currently muted */
 	public var muted(get, set):Bool;
-	private inline function get_muted() return vid.muted;
-	private inline function set_muted(v : Bool) return (vid.muted = v);
+	private inline function get_muted() return sound.muted;
+	private inline function set_muted(v : Bool) return (sound.muted = v);
 
 	public var buffered(get, never):TimeRanges;
-	private inline function get_buffered():TimeRanges return vid.buffered;
+	private inline function get_buffered():TimeRanges return sound.buffered;
 	public var played(get, never):TimeRanges;
-	private inline function get_played():TimeRanges return vid.played;
-
-	public var aspectRatio(get, never):Ratio;
-	private inline function get_aspectRatio():Ratio {
-		return new Ratio(vid.videoWidth, vid.videoHeight);
-	}
+	private inline function get_played():TimeRanges return sound.played;
 
 /* === Instance Fields === */
 
 	/* the VideoElement in use by [this] object */
-	private var vid : Vid;
+	private var sound : Aud;
 
 	/* == media-event Signals == */
 	public var onload : VSignal;
@@ -376,23 +266,21 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	public var ondurationchange : Signal<Delta<Duration>>;
 	public var onvolumechange : Signal<Delta<Float>>;
 	public var onratechange : Signal<Delta<Float>>;
-	public var onstatechange : Signal<VideoState>;
-
-	private var ready : Bool = false;
+	public var onstatechange : Signal<AudioState>;
 
 /* === Static Methods === */
 
 	/**
 	  * Create and return a new Vid object
 	  */
-	private static inline function createVid():Vid {
-		return js.Browser.document.createVideoElement();
+	private static inline function createSound():Audel {
+		return js.Browser.document.createAudioElement();
 	}
 
 	private static inline var FPS : Int = 30;
 }
 
-typedef VideoState = {
+typedef AudioState = {
 	volume : Float,
 	speed : Float
 };
