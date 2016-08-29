@@ -1,7 +1,5 @@
 package gryffin.display;
 
-import js.html.CanvasRenderingContext2D in Cd;
-
 import gryffin.display.Context;
 
 @:forward
@@ -15,3 +13,13 @@ abstract Ctx (Context) from Context to Context {
 		return new Ctx( c );
 	}
 }
+
+#if !macro
+
+typedef Cd = js.html.CanvasRenderingContext2D;
+
+#else
+
+typedef Cd = Dynamic;
+
+#end
