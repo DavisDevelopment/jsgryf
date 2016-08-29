@@ -6,13 +6,16 @@ import tannus.ds.Object;
 import tannus.io.Ptr;
 
 import gryffin.display.*;
+#if !macro
 import js.html.CanvasRenderingContext2D in Context;
 import js.Lib.nativeThis in nthis;
+#end
 
 using Lambda;
 using tannus.ds.ArrayTools;
 
 class CtxTools {
+#if !macro
 	/**
 	  * Patched CanvasRenderingContext2D::measureText
 	  */
@@ -148,4 +151,5 @@ class CtxTools {
 	public static function __init__():Void {
 
 	}
+#end
 }
