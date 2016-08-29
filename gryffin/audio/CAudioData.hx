@@ -16,8 +16,8 @@ using tannus.math.TMath;
 
 class CAudioData<T:Float> {
 	/* Constructor Function */
-	public function new(a : AudioAnalyser):Void {
-		analyser = a;
+	public function new():Void {
+		//analyser = a;
 	}
 
 /* === Instance Methods === */
@@ -26,13 +26,20 @@ class CAudioData<T:Float> {
 	  * Copy [this]
 	  */
 	public function clone():CAudioData<T> {
-		return new CAudioData( analyser );
+		return new CAudioData();
 	}
 
 	/**
 	  * Get a subset of [this]
 	  */
 	public function slice(start:Int, ?end:Int):CAudioData<T> {
+		return clone();
+	}
+
+	/**
+	  * Invert [this]
+	  */
+	public function invert():CAudioData<T> {
 		return clone();
 	}
 
@@ -44,20 +51,30 @@ class CAudioData<T:Float> {
 	}
 
 	/* get a value */
-	public function get(index : Int):T return d.get( index );
+	public inline function get(index : Int):T return untyped d[index];
+	public inline function set(index:Int, value:T):T return (untyped d[index] = value);
+
+	/**
+	  * Convert [this] into a ByteArray
+	  */
+	public function toByteArray():ByteArray {
+		return ByteArray.alloc( 0 );
+	}
 
 /* === Computed Instance Fields === */
 
 	public var length(get, never):Int;
 	private inline function get_length():Int return d.length;
 
+	/*
 	private var a(get, never):AnalyserNode;
 	private inline function get_a():AnalyserNode return analyser.node;
+	*/
 
 /* === Instance Fields === */
 
 	public var d : TypedArray<T>;
-	public var analyser : AudioAnalyser;
+	//public var analyser : AudioAnalyser;
 }
 
 class AudioDataIter<T:Float> {
