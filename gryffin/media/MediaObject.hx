@@ -33,6 +33,7 @@ interface MediaObject {
 	var buffered(get, never):TimeRanges;
 	var played(get, never):TimeRanges;
 
+	function clear():Void;
 	function destroy():Void;
 	function play():Void;
 	function pause():Void;
