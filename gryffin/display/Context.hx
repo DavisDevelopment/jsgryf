@@ -1,6 +1,8 @@
 package gryffin.display;
 
+#if !macro
 import js.html.*;
+#end
 
 import tannus.geom.*;
 import tannus.ds.Stack;
@@ -212,13 +214,15 @@ class Context {
 	/**
 	  * Get the Pixels in the given area
 	  */
-	public function pixels(x:Float, y:Float, w:Float, h:Float):Pixels {
-		var idata = getImageData(x, y, w, h);
-		var pos = new Point(x, y);
-		return new Pixels(this, pos, idata);
+	public inline function getPixels(x:Float, y:Float, w:Float, h:Float):Pixels {
+		return new Pixels(getImageData(x, y, w, h));
 	}
 
-	public inline function putImageData(imagedata:ImageData, dx:Float, dy:Float, dirtyX:Float, dirtyY:Float, dirtyWidth:Float, dirtyHeight:Float):Void {
+	public inline function putPixels(pixels:Pixels, x:Float, y:Float, ?dx:Float, ?dy:Float, ?dw:Float, ?dh:Float):Void {
+		putImageData(pixels.imageData, x, y, dx, dy, dw, dh);
+	}
+
+	public inline function putImageData(imagedata:ImageData, dx:Float, dy:Float, ?dirtyX:Float, ?dirtyY:Float, ?dirtyWidth:Float, ?dirtyHeight:Float):Void {
 		ctx.putImageData(imagedata, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
 	}
 
@@ -446,3 +450,16 @@ typedef TextMetrics = {
 	var ascent : Float;
 	var descent : Float;
 };
+
+#if macro
+
+private typedef CanvasRenderingContext2D = Dynamic;
+private typedef CanvasElement = Dynamic;
+private typedef Element = Dynamic;
+private typedef CanvasWindingRule = Dynamic;
+private typedef HitRegionOptions = Dynamic;
+private typedef ImageData = Dynamic;
+private typedef CanvasGradient = Dynamic;
+private typedef Path2D = Dynamic;
+
+#end
