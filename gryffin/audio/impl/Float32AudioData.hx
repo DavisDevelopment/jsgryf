@@ -8,7 +8,7 @@ import Std.*;
 import Math.*;
 import tannus.math.TMath.*;
 
-import js.html.Uint8Array;
+import js.html.Float32Array;
 import js.html.ArrayBuffer;
 
 using Lambda;
@@ -16,22 +16,22 @@ using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 using tannus.html.JSTools;
 
-class ByteAudioData implements IAudioData<Int> {
+class Float32AudioData implements IAudioData<Float> {
 	/* Constructor Function */
-	public function new(array : Uint8Array):Void {
+	public function new(array : Float32Array):Void {
 		d = array;
 		buffer = d.buffer;
 	}
 
 /* === Instance Methods === */
 
-	public inline function get(i:Int):Int return d[i];
-	public inline function set(i:Int, v:Int):Int return (d[i] = v);
-	public inline function iterator():Iterator<Int> return new ADIter( this );
-	public inline function clone():IAudioData<Int> {
-		return new ByteAudioData(new Uint8Array(d.buffer.slice( 0 )));
+	public inline function get(i:Int):Float return d[i];
+	public inline function set(i:Int, v:Float):Float return (d[i] = v);
+	public inline function iterator():Iterator<Float> return new ADIter( this );
+	public inline function clone():IAudioData<Float> {
+		return new Float32AudioData(new Float32Array(d.buffer.slice( 0 )));
 	}
-	public inline function slice(start:Int, ?end:Int):IAudioData<Int> return new ByteAudioData(d.subarray(start, end));
+	public inline function slice(start:Int, ?end:Int):IAudioData<Float> return new Float32AudioData(d.subarray(start, end));
 
 	/**
 	  * Reverse [this] data, 
@@ -47,26 +47,34 @@ class ByteAudioData implements IAudioData<Int> {
 	/**
 	  * Create and return a copy of [this] that is inverted
 	  */
-	public function invert():IAudioData<Int> {
-		var id:Uint8Array = new Uint8Array(d.buffer.slice( 0 ));
+	public function invert():IAudioData<Float> {
+		var id:Float32Array = new Float32Array(d.buffer.slice( 0 ));
 		for (i in 0...id.length) {
 			id[i] = (255 - id[i]);
 		}
-		return new ByteAudioData( id );
+		return new Float32AudioData( id );
 	}
 
 	/**
 	  * Convert [this] into a ByteArray
 	  */
 	public function getByteArray(?start:Int, ?end:Int):ByteArray {
-		var clone_d:Uint8Array = new Uint8Array(d.subarray(start, end).arrayify());
-		return ByteArray.ofData( clone_d.buffer );
+		if (start == null) start = 0;
+		if (end == null) end = (length - 1);
+		var len = (end - start);
+		var bytes = ByteArray.alloc(4 * len);
+		for (i in start...end) {
+			bytes.setFloat((i - start), get( i ));
+		}
+		return bytes;
 	}
 
 	/**
 	  * Write all or a slice of [this] data onto [other]
 	  */
-	public function writeTo(other:IAudioData<Int>, ?offset:Int, ?start:Int, ?end:Int):Void {
+	public inline function writeTo(other:IAudioData<Float>, ?offset:Int, ?start:Int, ?end:Int):Void {
+		cast(other, Float32Array).set(d.subarray(start, end), offset);
+		/*
 		if (start == null) start = 0;
 		if (end == null) end = length - 1;
 		if (offset == null) offset = 0;
@@ -74,12 +82,13 @@ class ByteAudioData implements IAudioData<Int> {
 		for (i in start...end) {
 			other.set((i + offset), get( i ));
 		}
+		*/
 	}
 
 	/**
 	  * Copy [other]s data onto [this]
 	  */
-	public inline function copyFrom(other:IAudioData<Int>, ?offset:Int, ?start:Int, ?end:Int):Void other.writeTo(this, offset, start, end);
+	public inline function copyFrom(other:IAudioData<Float>, ?offset:Int, ?start:Int, ?end:Int):Void other.writeTo(this, offset, start, end);
 
 /* === Computed Instance Fields === */
 
@@ -89,5 +98,5 @@ class ByteAudioData implements IAudioData<Int> {
 /* === Instance Fields === */
 
 	public var buffer : ArrayBuffer;
-	private var d : Uint8Array;
+	private var d : Float32Array;
 }
