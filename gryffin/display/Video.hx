@@ -46,6 +46,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		onpause = new VSignal();
 		onload = new VSignal();
 		onprogress = new Signal();
+		onloadeddata = new VSignal();
 		onloadedmetadata = new VSignal();
 
 		listen();
@@ -89,6 +90,15 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		var canvas:Canvas = Canvas.create(w, h);
 		canvas.context.drawImage(vid, x, y, width, height, 0, 0, w, h);
 		return canvas;
+	}
+
+	/**
+	  * Create a deep copy of [this]
+	  */
+	public function clone():Video {
+		var ce = vid.cloneNode( true );
+		var cv = new Video(cast ce);
+		return cv;
 	}
 
 	/**
@@ -208,6 +218,18 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	}
 
 	/**
+	  * unload the current media and reset the underlying element
+	  */
+	public function clear():Void {
+		var state = getState();
+		pause();
+		vid.remove();
+		vid = null;
+		vid = createVid();
+		setState( state );
+	}
+
+	/**
 	  * Bind the Signal fields of [this] Video to the underlying events
 	  */
 	private function listen():Void {
@@ -222,6 +244,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		on('progress', function(e) {
 			onprogress.call( progress );
 		});
+		on('loadeddata', onloadeddata.fire);
 		on('loadedmetadata', onloadedmetadata.fire);
 
 		durationChanged();
@@ -371,6 +394,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	public var onplay : VSignal;
 	public var onpause : VSignal;
 	public var onprogress : Signal<Percent>;
+	public var onloadeddata : VSignal;
 	public var onloadedmetadata : VSignal;
 
 	public var ondurationchange : Signal<Delta<Duration>>;
