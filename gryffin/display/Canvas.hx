@@ -30,6 +30,14 @@ class Canvas implements Paintable {
 /* === Instance Methods === */
 
 	/**
+	  * Create and return a perfect clone of [this] Canvas
+	  */
+	public function clone():Canvas {
+		var c:NCanvas = cast canvas.cloneNode();
+		return new Canvas( c );
+	}
+
+	/**
 	  * Resize [this] Canvas
 	  */
 	public function resize(w:Int, h:Int):Void {
@@ -121,7 +129,7 @@ class Canvas implements Paintable {
 	/* the pixels of [this] Canvas */
 	public var pixels(get, never):Pixels;
 	private function get_pixels():Pixels {
-		return context.pixels(0, 0, width, height);
+		return context.getPixels(0, 0, width, height).link(context, new Rectangle(0, 0, width, height));
 	}
 
 /* === Instance Methods === */
