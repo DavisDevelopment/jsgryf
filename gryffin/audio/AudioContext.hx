@@ -3,6 +3,7 @@ package gryffin.audio;
 import gryffin.core.Stage;
 import gryffin.core.EventDispatcher;
 import gryffin.display.*;
+import gryffin.media.MediaObject;
 
 import tannus.geom.*;
 import tannus.math.Percent;
@@ -37,10 +38,25 @@ class AudioContext {
 /* === Instance Methods === */
 
 	/**
+	  * dispose of [this] Context, releasing any resources that it has allocated
+	  */
+	public function close(cb : Void->Void):Void {
+		(untyped c).close().then( cb );
+	}
+
+	/**
 	  * Create a source node
 	  */
-	public function createSource(audio : Audio):AudioSource {
-		return new AudioSource(this, c.createMediaElementSource( audio.sound ));
+	@:access( gryffin.display.Video )
+	public function createSource(src : MediaObject):AudioSource {
+		var element:Dynamic = src;
+		if (Std.is(src, Audio)) {
+			element = cast(src, Audio).sound;
+		}
+		else if (Std.is(src, Video)) {
+			element = cast(src, Video).vid;
+		}
+		return new AudioSource(this, c.createMediaElementSource(cast element));
 	}
 
 	/**
@@ -48,6 +64,32 @@ class AudioContext {
 	  */
 	public function createAnalyser():AudioAnalyser {
 		return new AudioAnalyser( this );
+	}
+
+	/**
+	  * Create a channel splitter
+	  */
+	public function createChannelSplitter(channels : Int):AudioChannelSplitter {
+		return new AudioChannelSplitter(this, channels);
+	}
+
+	/**
+	  * Create a channel merger
+	  */
+	public function createChannelMerger(channels : Int):AudioChannelMerger {
+		return new AudioChannelMerger(this, channels);
+	}
+
+	public function createBuffer(numberOfChannels:Int, length:Int, sampleRate:Float):AudioBuffer {
+		return new AudioBuffer(this, c.createBuffer(numberOfChannels, length, sampleRate));
+	}
+
+	public function createRawProcessor(?bufferSize:Int, ?inChannels:Int, ?outChannels:Int):RawAudioShader {
+		return new RawAudioShader(this, bufferSize, inChannels, outChannels);
+	}
+
+	public function createShader(?bufferSize:Int, ?inChannels:Int, ?outChannels:Int):AudioShader {
+		return new AudioShader(this, createRawProcessor(bufferSize, inChannels, outChannels));
 	}
 
 /* === Instance Fields === */
