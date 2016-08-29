@@ -367,6 +367,7 @@ class MenuItem extends EventDispatcher {
 	/**
 	  * Perform chroma-key replacement on the check-icon
 	  */
+	/*
 	private function makeWhite():Void {
 		var black:Color = new Color();
 		var c:Canvas = checkIcon.toCanvas();
@@ -379,6 +380,7 @@ class MenuItem extends EventDispatcher {
 		p.save();
 		checkIcon = Image.load(c.dataURI());
 	}
+	*/
 
 	/**
 	  * Check whether the given Point lies inside of [this] or any of it's children
