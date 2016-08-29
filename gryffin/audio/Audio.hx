@@ -121,6 +121,26 @@ class Audio extends EventDispatcher implements Stateful<AudioState> implements g
 	}
 
 	/**
+	  * unload the current media and reset the underlying element
+	  */
+	public function clear():Void {
+		var state = getState();
+		pause();
+		/*
+		function del(){
+			var me = js.Lib.nativeThis;
+			//(untyped __js__('delete'))( me );
+			me.remove();
+		};
+		(untyped del).call( sound );
+		*/
+		sound.remove();
+		sound = null;
+		sound = cast createSound();
+		setState( state );
+	}
+
+	/**
 	  * Bind the Signal fields of [this] Video to the underlying events
 	  */
 	private function listen():Void {
