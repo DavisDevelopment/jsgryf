@@ -19,7 +19,7 @@ class MouseListener implements EventCreator {
 	/* Constructor Function */
 	public function new(s : Stage):Void {
 		stage = s;
-		relevant = ['click', 'mouseup', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'contextmenu', 'mousewheel'];
+		relevant = ['click', 'mouseup', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'contextmenu', 'wheel'];
 
 		bind();
 	}
@@ -52,7 +52,7 @@ class MouseListener implements EventCreator {
 	  * Listen for mouse-wheel events
 	  */
 	private function bindWheel():Void {
-		canvas.addEventListener('mousewheel', handleWheel);
+		canvas.addEventListener('wheel', handleWheel);
 	}
 
 	/**
