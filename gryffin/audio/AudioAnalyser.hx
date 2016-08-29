@@ -37,7 +37,7 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 	public function getByteFrequencyData():AudioData<Int> {
 		var d = new Uint8Array( frequencyCount );
 		node.getByteFrequencyData( d );
-		return AudioData.byte(this, d);
+		return AudioData.byte( d );
 	}
 
 	/**
@@ -46,7 +46,7 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 	public function getFloatFrequencyData():AudioData<Float> {
 		var d = new Float32Array( frequencyCount );
 		node.getFloatFrequencyData( d );
-		return AudioData.float(this, d);
+		return AudioData.float( d );
 	}
 
 	/**
@@ -55,7 +55,7 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 	public function getByteTimeDomainData():AudioData<Int> {
 		var d = new Uint8Array( frequencyCount );
 		node.getByteTimeDomainData( d );
-		return AudioData.byte(this, d);
+		return AudioData.byte( d );
 	}
 
 	/**
@@ -64,7 +64,7 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 	public function getFloatTimeDomainData():AudioData<Float> {
 		var d = new Float32Array( frequencyCount );
 		node.getFloatTimeDomainData( d );
-		return AudioData.float(this, d);
+		return AudioData.float( d );
 	}
 
 /* === Computed Instance Fields === */
@@ -82,6 +82,14 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 
 	public var frequencyCount(get, never):Int;
 	private inline function get_frequencyCount():Int return node.frequencyBinCount;
+
+	public var fftSize(get, set):Int;
+	private inline function get_fftSize():Int return node.fftSize;
+	private inline function set_fftSize(v : Int):Int return (node.fftSize = v);
+
+	public var smoothing(get, set):Float;
+	private inline function get_smoothing():Float return node.smoothingTimeConstant;
+	private inline function set_smoothing(v : Float):Float return (node.smoothingTimeConstant = v);
 
 /* === Instance Fields === */
 }
