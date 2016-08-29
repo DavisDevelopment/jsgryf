@@ -39,11 +39,37 @@ class AudioNode<T:NNode> {
 	/**
 	  * Connect one output of [this] node to one input of [other]
 	  */
-	public function connect<T:NNode>(other : AudioNode<T>):Void {
-		node.connect( other.node );
+	public function connect<T:NNode>(other:AudioNode<T>, ?rest:Array<Dynamic>):Void {
+		var n = conode();
+		Reflect.callMethod(n, n.connect, [untyped other.conode()].concat(rest != null ? rest : []));
 	}
 
+	/**
+	  * Disconnect [this] Node from a Node that it is currently connected to
+	  */
+	public function disconnect<T:NNode>(?destination : AudioNode<NNode>):Void {
+		var n = conode();
+		if (destination != null) {
+			n.disconnect(untyped destination.conode());
+		}
+		else {
+			n.disconnect();
+		}
+	}
+
+	/**
+	  * CoNode -- Co(nnection )Node
+	  * used to retrieve the NNode instance used in 'connect' and 'disconnect' calls
+	  */
+	private function conode():T return node;
+
 /* === Computed Instance Fields === */
+
+	public var numberOfInputs(get, never):Int;
+	private inline function get_numberOfInputs():Int return node.numberOfInputs;
+
+	public var numberOfOutputs(get, never):Int;
+	private inline function get_numberOfOutputs():Int return node.numberOfOutputs;
 
 /* === Instance Fields === */
 
