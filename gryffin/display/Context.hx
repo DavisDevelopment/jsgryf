@@ -182,7 +182,7 @@ class Context {
 	}
 
 
-	public function drawImage(image:Dynamic, sx:Float, sy:Float, sw:Float, sh:Float, dx:Float, dy:Float, dw:Float, dh:Float):Void {
+	public function drawImage(image:Dynamic, sx:Float, sy:Float, ?sw:Float, ?sh:Float, ?dx:Float, ?dy:Float, ?dw:Float, ?dh:Float):Void {
 		ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
 	}
 
