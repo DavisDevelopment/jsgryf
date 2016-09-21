@@ -40,6 +40,9 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		onratechange = new Signal();
 		onstatechange = new Signal();
 
+		onseekbegin = new VSignal();
+		onseekend = new VSignal();
+
 		onended = new VSignal();
 		oncanplay = new VSignal();
 		onplay = new VSignal();
@@ -87,6 +90,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 			w = (width - x);
 		if (h == null)
 			h = (height - y);
+
 		var canvas:Canvas = Canvas.create(w, h);
 		canvas.context.drawImage(vid, x, y, width, height, 0, 0, w, h);
 		return canvas;
@@ -247,9 +251,17 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		on('loadeddata', onloadeddata.fire);
 		on('loadedmetadata', onloadedmetadata.fire);
 
+		on('seeking', onseekbegin.fire);
+		on('seeked', onseekend.fire);
+
 		durationChanged();
 		volumeChanged();
 		rateChanged();
+
+		onloadedmetadata.once(function() {
+			width = naturalWidth;
+			height = naturalHeight;
+		});
 	}
 
 	/* listen to the 'durationchange' Event */
@@ -292,12 +304,20 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 /* === Computed Instance Fields === */
 
 	/* the width of [this] Video */
-	public var width(get, never):Int;
-	private inline function get_width():Int return (vid.videoWidth);
+	public var width(get, set):Int;
+	private inline function get_width():Int return (vid.width);
+	private inline function set_width(v : Int):Int return (vid.width = v);
 	
 	/* the height of [this] Video */
-	public var height(get, never):Int;
-	private inline function get_height():Int return (vid.videoHeight);
+	public var height(get, set):Int;
+	private inline function get_height():Int return (vid.height);
+	private inline function set_height(v : Int):Int return (vid.height = v);
+
+	public var naturalWidth(get, never):Int;
+	private inline function get_naturalWidth():Int return vid.videoWidth;
+
+	public var naturalHeight(get, never):Int;
+	private inline function get_naturalHeight():Int return vid.videoHeight;
 
 	/* the rect of [this] Video */
 	public var rect(get, never):Rectangle;
@@ -396,6 +416,9 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	public var onprogress : Signal<Percent>;
 	public var onloadeddata : VSignal;
 	public var onloadedmetadata : VSignal;
+
+	public var onseekbegin : VSignal;
+	public var onseekend : VSignal;
 
 	public var ondurationchange : Signal<Delta<Duration>>;
 	public var onvolumechange : Signal<Delta<Float>>;
