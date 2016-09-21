@@ -35,36 +35,45 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 	  * Get the current frequency data, as bytes
 	  */
 	public function getByteFrequencyData():AudioData<Int> {
-		var d = new Uint8Array( frequencyCount );
-		node.getByteFrequencyData( d );
-		return AudioData.byte( d );
+		ensureCache();
+		node.getByteFrequencyData( ui8 );
+		return AudioData.byte( ui8 );
 	}
 
 	/**
 	  * Get the current frequency data, as floats
 	  */
 	public function getFloatFrequencyData():AudioData<Float> {
-		var d = new Float32Array( frequencyCount );
-		node.getFloatFrequencyData( d );
-		return AudioData.float( d );
+		ensureCache();
+		node.getFloatFrequencyData( f32 );
+		return AudioData.float( f32 );
 	}
 
 	/**
 	  * Get the current waveform data, as bytes
 	  */
 	public function getByteTimeDomainData():AudioData<Int> {
-		var d = new Uint8Array( frequencyCount );
-		node.getByteTimeDomainData( d );
-		return AudioData.byte( d );
+		ensureCache();
+		node.getByteTimeDomainData( ui8 );
+		return AudioData.byte( ui8 );
 	}
 
 	/**
 	  * Get the current waveform data, as floats
 	  */
 	public function getFloatTimeDomainData():AudioData<Float> {
-		var d = new Float32Array( frequencyCount );
-		node.getFloatTimeDomainData( d );
-		return AudioData.float( d );
+		ensureCache();
+		node.getFloatTimeDomainData( f32 );
+		return AudioData.float( f32 );
+	}
+
+	private inline function ensureCache():Void {
+		if (f32 == null || f32.length != frequencyCount) {
+			f32 = new Float32Array( frequencyCount );
+		}
+		if (ui8 == null || ui8.length != frequencyCount) {
+			ui8 = new Uint8Array( frequencyCount );
+		}
 	}
 
 /* === Computed Instance Fields === */
@@ -92,4 +101,7 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 	private inline function set_smoothing(v : Float):Float return (node.smoothingTimeConstant = v);
 
 /* === Instance Fields === */
+
+	private var f32 : Null<Float32Array> = null;
+	private var ui8 : Null<Uint8Array> = null;
 }
