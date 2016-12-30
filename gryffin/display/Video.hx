@@ -204,6 +204,17 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	}
 
 	/**
+	  * Seek [this] Video to the given position
+	  */
+	public function seek(time:Float, ?callback:Void->Void):Void {
+		if (callback != null) {
+			onseekend.once( callback );
+		}
+
+		currentTime = time;
+	}
+
+	/**
 	  * Get a copy of the current state of [this] Video
 	  */
 	public function getState():VideoState {

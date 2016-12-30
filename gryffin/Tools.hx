@@ -31,7 +31,12 @@ class Tools {
 	  * Delay the invokation of the given Function till the end of the current Stack
 	  */
 	public static function defer(f : Void->Void):Void {
-		wait(10, f);
+		//wait(10, f);
+#if (js && node)
+		(untyped __js__('process.nextTick')( f ));
+#else
+		(untyped win.requestAnimationFrame)( f );
+#end
 	}
 
 	/**

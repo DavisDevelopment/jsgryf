@@ -5,6 +5,10 @@ import tannus.io.Ptr;
 import tannus.ds.Object;
 import tannus.nore.Selector;
 
+import haxe.extern.EitherType in Either;
+
+import gryffin.Tools.*;
+
 import gryffin.display.Ctx;
 import gryffin.core.Stage;
 import gryffin.core.EventDispatcher; import gryffin.fx.*;
@@ -24,6 +28,7 @@ class Entity extends EventDispatcher {
 		parent = null;
 		priority = 0;
 		effects = new Array();
+		_compMap = new Map();
 
 		once('activated', init);
 	}
@@ -115,10 +120,16 @@ class Entity extends EventDispatcher {
 	  * Update the state of [this] Entity
 	  */
 	public function update(s : Stage):Void {
+		//(old system) handle Effects
 		for (e in effects) {
 			if (e.active( this )) {
 				e.affect( this );
 			}
+		}
+
+		//(new system)
+		if (rootComponent != null) {
+			rootComponent.onUpdate( now );
 		}
 	}
 
@@ -209,6 +220,102 @@ class Entity extends EventDispatcher {
 		}
 	}
 
+	/**
+	  * Add a Component to [this]
+	  */
+	public function addComponent<T:Component>(c : T):Void {
+		// claim [c]
+		if (c.owner != null) {
+			c.owner.removeComponent( c );
+		}
+
+		c.owner = this;
+		c.onAdded();
+
+		// attach [c]
+		if (rootComponent == null) {
+			rootComponent = c;
+		}
+		else {
+			//TODO detach Component from previous owner
+			// get the last Component
+			var tail:Component = null;
+			var node:Component = rootComponent;
+			while (node != null) {
+				tail = node;
+				node = node.next;
+			}
+			tail.next = c;
+		}
+	}
+
+	/**
+	  * Remove a Component from [this]
+	  */
+	public function removeComponent<T:Component>(c : T):Bool {
+		if (rootComponent != null) {
+			var prev:Component = null;
+			var node:Component = rootComponent;
+			while (node != null) {
+				if (node == c) {
+					if (prev == null) {
+						rootComponent = node.next;
+					}
+					else {
+						prev.next = node.next;
+					}
+					c.onRemoved();
+					c.owner = null;
+					return true;
+				}
+				prev = node;
+				node = node.next;
+			}
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
+
+	/**
+	  * Get a Component by name
+	  */
+	public function getComponent<T:Component>(name : String):Null<T> {
+		if (rootComponent != null) {
+			var c:Component = rootComponent;
+			while(c != null) {
+				if (c.name == name) {
+					return untyped c;
+				}
+				c = c.next;
+			}
+			return null;
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	  * Check for existence of a given Component
+	  */
+	public function hasComponent(component : String):Bool {
+		if (rootComponent == null) {
+			return false;
+		}
+		else {
+			var c = rootComponent;
+			while (c != null) {
+				if (c.name == component) {
+					return true;
+				}
+				c = c.next;
+			}
+			return false;
+		}
+	}
+
 /* === Instance Fields === */
 
 	public var _cached : Bool;
@@ -225,4 +332,7 @@ class Entity extends EventDispatcher {
 		return (parent = p);
 	}
 	public var id : String;
+
+	private var _compMap:Map<String, Component>;
+	private var rootComponent:Null<Component> = null;
 }

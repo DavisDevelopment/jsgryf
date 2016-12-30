@@ -100,16 +100,22 @@ class EventDispatcher {
 	/**
 	  * Forward [event] to [target]
 	  */
-	public function forward(event:String, target:EventDispatcher):Void {
-		on(event, target.call.bind(event, _));
+	public function forward<A,B>(event:String, target:EventDispatcher, ?mapper:A->B):Void {
+		on(event, function(data : A) {
+			target.call(event, (mapper != null ? untyped mapper( data ) : untyped data));
+		});
 	}
 
 	/**
 	  * Forward all [events] to [target]
 	  */
-	public function forwardAll(events:Array<String>, target:EventDispatcher):Void {
-		for (e in events)
-			forward(e, target);
+	public function forwardAll<A,B>(events:Array<String>, target:EventDispatcher, ?mapper:A->B):Void {
+		function _handler(name:String, data:A):Void {
+			target.call(name, (mapper != null ? untyped mapper( data ) : untyped data));
+		}
+		for (event in events) {
+			on(event, _handler.bind(event));
+		}
 	}
 
 	/**

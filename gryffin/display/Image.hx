@@ -17,7 +17,7 @@ import js.Browser.document in doc;
 using tannus.math.TMath;
 using tannus.ds.ArrayTools;
 
-class Image implements Paintable {
+class Image implements BitmapSource {
 	/* Constructor Function */
 	public function new(?i : Img):Void {
 		img = (i != null ? i : cast doc.createImageElement());
@@ -33,12 +33,12 @@ class Image implements Paintable {
 	  * Initialize [this] Image
 	  */
 	private inline function __init():Void {
-		img.onload = function() {
+		img.addEventListener('load', function(event:Dynamic) {
 			ready.fire();
-		};
-		img.onerror = function(err : Dynamic) {
-			js.Browser.console.error( err );
-		};
+		});
+		img.addEventListener('error', function(error:Dynamic) {
+			trace( error );
+		});
 		
 		if ( img.complete ) {
 			defer( ready.fire );
@@ -122,6 +122,10 @@ class Image implements Paintable {
 		var rotatedHeight = (p + q);
 		return new Rectangle(0, 0, rotatedWidth, rotatedHeight);
 	}
+
+	public function getWidth():Int return width;
+	public function getHeight():Int return height;
+
 /* === Computed Instance Fields === */
 
 	/* the 'src' of [this] Image */
@@ -169,7 +173,7 @@ class Image implements Paintable {
 			var img:Image = new Image();
 			if (cb != null) {
 				img.ready.once(function() {
-					cb( img );
+					defer(cb.bind( img ));
 				});
 			}
 			img.src = src;

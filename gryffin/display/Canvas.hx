@@ -4,6 +4,7 @@ import tannus.ds.Ref;
 import tannus.geom.*;
 import tannus.io.ByteArray;
 import tannus.io.Blob;
+import tannus.html.Blobable;
 
 import gryffin.display.Ctx;
 import gryffin.display.Context;
@@ -17,7 +18,7 @@ import js.html.FileReader;
 import Math.*;
 import tannus.math.TMath.*;
 
-class Canvas implements Paintable {
+class Canvas implements BitmapSource implements Blobable {
 	/* Constructor Function */
 	public function new(?c:NCanvas):Void {
 		if (c != null)
@@ -72,35 +73,37 @@ class Canvas implements Paintable {
 	public function paint(c:Ctx, src:Rectangle, dest:Rectangle):Void {
 		c.drawImage(canvas, src.x, src.y, src.w, src.h, dest.x, dest.y, dest.w, dest.h);
 	}
+	public function getWidth():Int return width;
+	public function getHeight():Int return height;
 
 	/**
 	  * Get the DataURI for [this] Canvas
 	  */
-	public function dataURI(?type:String):String {
+	public inline function dataURI(?type:String):String {
 		return canvas.toDataURL( type );
 	}
 
 	/**
 	  * Get a Blob from [this] Canvas
 	  */
-	public function toBlob(cb:Blob -> Void, ?type:String) {
-		canvas.toBlob(function(b : JBlob) {
-			var readr = new FileReader();
-			readr.onload = function(e) {
-				var data:ByteArray = ByteArray.ofData(cast e.target.result);
-				var blob = new Blob('blob', (type==null?'image/png':type), data);
-				cb( blob );
-			};
-			readr.readAsArrayBuffer( b );
-		}, type);
+	public inline function toBlob(cb:JBlob->Void, ?type:String):Void {
+		canvas.toBlob(cb, type);
 	}
 
 	/**
 	  * Get an Image from [this] Canvas
 	  */
-	public function getImage(cb : Image->Void):Image {
-		return Image.load(dataURI(), cb);
+	public inline function getImage(cb:Image->Void, ?type:String):Void {
+		Image.load(dataURI( type ), cb);
 	}
+	/*
+	public function getImage(callback:Image->Void, ?type:String):Void {
+		toBlob(function(blob : JBlob) {
+			var blobUrl:String = (untyped __js__('(window.URL || window.webkitURL).createObjectURL.bind( window )'))( blob );
+			Image.load(blobUrl, callback);
+		}, type);
+	}
+	*/
 
 /* === Computed Instance Methods === */
 
