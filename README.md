@@ -1,0 +1,2 @@
+# jsgryf
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bb82de2aab0c4204a68643fd2ea382c7)](https://www.codacy.com/app/epikit/jsgryf?utm_source=github.com&utm_medium=referral&utm_content=DavisDevelopment/jsgryf&utm_campaign=badger)
