@@ -339,9 +339,9 @@ class TextBox implements Paintable {
 	}
 
 	/* font size */
-	public var fontSize(get, set):Int;
-	private function get_fontSize():Int return _fontSize;
-	private function set_fontSize(v : Int):Int {
+	public var fontSize(get, set):Float;
+	private function get_fontSize():Float return _fontSize;
+	private function set_fontSize(v : Float):Float {
 		if (v != _fontSize) {
 			changed();
 		}
@@ -447,7 +447,7 @@ class TextBox implements Paintable {
 	private var canvas:Canvas;
 	private var _padding:Float;
 	private var _fontFamily:String;
-	private var _fontSize:Int;
+	private var _fontSize:Float;
 	private var _fontSizeUnit:String;
 	private var _color:Color;
 	private var _backgroundColor:Null<Color>;
