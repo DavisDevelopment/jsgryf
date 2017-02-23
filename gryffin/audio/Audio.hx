@@ -214,6 +214,8 @@ class Audio extends EventDispatcher implements Stateful<AudioState> implements g
 	/* the duration of [this] Video */
 	public var duration(get, never):Duration;
 	private inline function get_duration():Duration return Duration.fromSecondsF(sound.duration);
+	public var durationTime(get, never):Float;
+	private inline function get_durationTime():Float return sound.duration;
 
 	/* the current time of [this] Video */
 	public var currentTime(get, set):Float;
@@ -265,8 +267,12 @@ class Audio extends EventDispatcher implements Stateful<AudioState> implements g
 
 	public var buffered(get, never):TimeRanges;
 	private inline function get_buffered():TimeRanges return sound.buffered;
+
 	public var played(get, never):TimeRanges;
 	private inline function get_played():TimeRanges return sound.played;
+
+	public var ended(get, never):Bool;
+	private inline function get_ended():Bool return sound.ended;
 
 /* === Instance Fields === */
 

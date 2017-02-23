@@ -61,6 +61,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	  * Destroy [this] Video
 	  */
 	public function destroy():Void {
+		pause();
 		vid.remove();
 	}
 
@@ -352,7 +353,10 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 
 	/* the duration of [this] Video */
 	public var duration(get, never):Duration;
-	private inline function get_duration():Duration return Duration.fromSecondsF(vid.duration);
+	private inline function get_duration():Duration return Duration.fromFloat( durationTime );
+
+	public var durationTime(get, never):Float;
+	private inline function get_durationTime():Float return vid.duration;
 
 	/* the current time of [this] Video */
 	public var currentTime(get, set):Float;
@@ -366,6 +370,9 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 		currentTime = v.totalSeconds;
 		return time;
 	}
+
+	public var ended(get, never):Bool;
+	private inline function get_ended():Bool return vid.ended;
 
 	/* the current 'progress' of [this] Video */
 	public var progress(get, set):Percent;
