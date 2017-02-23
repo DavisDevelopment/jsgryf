@@ -23,6 +23,7 @@ interface MediaObject {
 	var onratechange : Signal<Delta<Float>>;
 	var src(get, set):String;
 	var duration(get, never):Duration;
+	var durationTime(get, never):Float;
 	var currentTime(get, set):Float;
 	var time(get, set):Duration;
 	var progress(get, set):Percent;
@@ -32,6 +33,7 @@ interface MediaObject {
 	var muted(get, set):Bool;
 	var buffered(get, never):TimeRanges;
 	var played(get, never):TimeRanges;
+	var ended(get, never):Bool;
 
 	function clear():Void;
 	function destroy():Void;
