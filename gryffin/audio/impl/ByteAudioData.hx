@@ -60,7 +60,11 @@ class ByteAudioData implements IAudioData<Int> {
 	  */
 	public function getByteArray(?start:Int, ?end:Int):ByteArray {
 		var clone_d:Uint8Array = new Uint8Array(d.subarray(start, end).arrayify());
+#if node
+        return ByteArray.ofData(new tannus.node.Buffer(untyped clone_d));
+#else
 		return ByteArray.ofData( clone_d.buffer );
+#end
 	}
 
 	/**
