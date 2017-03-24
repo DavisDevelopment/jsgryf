@@ -380,6 +380,26 @@ class Stage extends EventDispatcher implements Container {
 	public inline function pause():Void manager.pause();
 	public inline function resume():Void manager.resume();
 
+	/**
+	  * get a position relative to [this] Stage, rather than the window
+	  */
+	public function globalToLocal(global : Point):Point {
+	    var pos:Point = global.clone();
+		var crect = canvas.canvas.getBoundingClientRect();
+		
+		pos.x -= crect.left;
+		pos.y -= crect.top;
+		return pos;
+	}
+
+	public function localToGlobal(local : Point):Point {
+	    var pos:Point = local.clone();
+	    var crect = canvas.canvas.getBoundingClientRect();
+	    pos.x += crect.left;
+	    pos.y += crect.top;
+	    return pos;
+	}
+
 /* === Computed Instance Fields === */
 
 	/* the width of [this] Stage */
