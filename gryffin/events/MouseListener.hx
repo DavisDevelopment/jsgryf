@@ -103,14 +103,8 @@ class MouseListener implements EventCreator {
 	/**
 	  * Find the coordinates of the given mouse-event, relative to the Canvas
 	  */
-	private function findPos(e : JMEvent):Point {
-		var pos:Point = new Point(e.clientX, e.clientY);
-		var crect = canvas.getBoundingClientRect();
-		
-		pos.x -= crect.left;
-		pos.y -= crect.top;
-
-		return pos;
+	private inline function findPos(e : JMEvent):Point {
+		return stage.globalToLocal(new Point(e.clientX, e.clientY));
 	}
 
 	/**
@@ -152,30 +146,6 @@ class MouseListener implements EventCreator {
 			var event:MouseEvent = new MouseEvent(e.type, pos, e.button, mods);
 			event.onDefaultPrevented.once(untyped e.preventDefault);
 			event.onPropogationStopped.once(untyped e.stopPropagation);
-
-			var target = getRootTarget( event );
-			switch ([lastTarget, target]) {
-				/* == mouseenter == */
-				case [null, entered] if (entered != null):
-					entered.dispatch('mouseenter', e);
-
-				/* == mouseleave == */
-				case [left, null] if (left != null):
-					left.dispatch('mouseleave', e);
-
-				/* == mousemove == */
-				case [left, right] if (left != null && right != null):
-					/* == moved within the same entity == */
-					if (left == right) {
-						left.dispatch('mousemove', e);
-					}
-
-					else {
-						left.dispatch('mouseleave', e);
-						right.dispatch('mouseenter', e);
-					}
-			}
-			lastTarget = target;
 			stage.mouseEvent( event );
 		}
 
