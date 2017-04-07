@@ -202,8 +202,8 @@ class Context {
 	}
 
 
-	public inline function createImageData(imagedata:ImageData):ImageData {
-		return ctx.createImageData(imagedata);
+	public inline function createImageData(w:Int, h:Int):ImageData {
+		return ctx.createImageData(w, h);
 	}
 
 
