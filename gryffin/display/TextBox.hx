@@ -95,13 +95,17 @@ class TextBox implements Paintable {
 	  * Automatically scale the font-size to the maximum that still 
 	  * draws text inside the given boundaries
 	  */
-	public function autoScale(?mw:Float, ?mh:Float):Void {
+	public function autoScale(?mw:Float, ?mh:Float, ?step:Float):Void {
+	    if (step == null) {
+	        step = 1.0;
+	    }
+
 		/* if neither [mw] nor [mh] are provided, do nothing */
 		if (mw == null && mh == null) {
 			return ;
 		}
 		else {
-			fontSize = 1;
+			fontSize = 1.0;
 
 			while ( true ) {
 				measure();
@@ -117,7 +121,7 @@ class TextBox implements Paintable {
 				}
 
 				/* if neither boundary has been exceeded, increase [fontSize] by one */
-				fontSize += 1;
+				fontSize += step;
 			}
 
 			/*
@@ -127,7 +131,7 @@ class TextBox implements Paintable {
 			   so we'll just decrement [fontSize] by one,
 			   and that's the result
 			*/
-			fontSize -= 1;
+			fontSize -= step;
 		}
 	}
 
