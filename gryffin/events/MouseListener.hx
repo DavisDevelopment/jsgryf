@@ -146,10 +146,12 @@ class MouseListener implements EventCreator {
 			var event:MouseEvent = new MouseEvent(e.type, pos, e.button, mods);
 			event.onDefaultPrevented.once(untyped e.preventDefault);
 			event.onPropogationStopped.once(untyped e.stopPropagation);
-			stage.mouseEvent( event );
+
+			//stage.mouseEvent( event );
+			stage.dispatch('mousemove', event);
 		}
 
-		//canvas.addEventListener('mousemove', _handle);
+		canvas.addEventListener('mousemove', _handle);
 	}
 
 	/**
