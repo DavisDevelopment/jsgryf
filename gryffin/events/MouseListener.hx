@@ -149,7 +149,7 @@ class MouseListener implements EventCreator {
 			stage.mouseEvent( event );
 		}
 
-		canvas.addEventListener('mousemove', _handle);
+		//canvas.addEventListener('mousemove', _handle);
 	}
 
 	/**
