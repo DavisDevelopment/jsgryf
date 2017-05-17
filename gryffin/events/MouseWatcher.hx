@@ -6,6 +6,8 @@ import gryffin.core.Entity;
 import tannus.events.MouseEvent;
 import tannus.geom.Point;
 
+import js.html.MouseEvent in JMEvent;
+
 using Lambda;
 
 class MouseWatcher {
@@ -45,8 +47,26 @@ class MouseWatcher {
 	  * Register event handlers
 	  */
 	private function _listen():Void {
-		stage.on('mousemove', handle);
 		stage.on('mouseleave', handle);
+
+		_handleMove();
+	}
+
+    /**
+      * handle mousemove events
+      */
+	private function _handleMove():Void {
+		function _handle(e : JMEvent):Void {
+			var pos:Point = stage.globalToLocal(new Point(e.clientX, e.clientY));
+			var event:MouseEvent = MouseEvent.fromJsEvent( e );
+			event.position = pos;
+
+			lastMouseEvent = event;
+			lastMousePos = event.position;
+			lastMove = event.date;
+		}
+
+        @:privateAccess stage.canvas.canvas.addEventListener('mousemove', _handle);
 	}
 
 	/**
