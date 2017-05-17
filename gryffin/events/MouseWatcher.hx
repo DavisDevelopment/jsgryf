@@ -48,8 +48,9 @@ class MouseWatcher {
 	  */
 	private function _listen():Void {
 		stage.on('mouseleave', handle);
+		stage.on('mousemove', handle);
 
-		_handleMove();
+		//_handleMove();
 	}
 
     /**
