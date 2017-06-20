@@ -41,7 +41,7 @@ class AudioContext {
 	  * dispose of [this] Context, releasing any resources that it has allocated
 	  */
 	public function close(cb : Void->Void):Void {
-		(untyped c).close().then( cb );
+		cast((untyped c).close(), js.Promise<Dynamic>).then(untyped cb);
 	}
 
 	/**
@@ -80,17 +80,28 @@ class AudioContext {
 		return new AudioChannelMerger(this, channels);
 	}
 
+    /**
+      * create a new AudioBuffer
+      */
 	public function createBuffer(numberOfChannels:Int, length:Int, sampleRate:Float):AudioBuffer {
 		return new AudioBuffer(this, c.createBuffer(numberOfChannels, length, sampleRate));
 	}
 
+    /**
+      * create an AudioScriptProcessor node
+      */
 	public function createRawProcessor(?bufferSize:Int, ?inChannels:Int, ?outChannels:Int):RawAudioShader {
 		return new RawAudioShader(this, bufferSize, inChannels, outChannels);
 	}
 
+    /**
+      * create a new AudioShader node
+      */
 	public function createShader(?bufferSize:Int, ?inChannels:Int, ?outChannels:Int):AudioShader {
 		return new AudioShader(this, createRawProcessor(bufferSize, inChannels, outChannels));
 	}
+
+/* === Computed Instance Fields === */
 
 /* === Instance Fields === */
 
