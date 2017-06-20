@@ -42,6 +42,59 @@ abstract Pixels (CPixels) from CPixels to CPixels {
 
 		return block;
 	}
+
+	/**
+	  * macro-licious method to iterate over [this] as fast as possible
+	  */
+	public macro function doScript(self:ExprOf<Pixels>, args:Array<Expr>) {
+	    var interval:Int = 1;
+	    if (args.length > 1) {
+	        switch (args[0].expr) {
+                case EConst(Constant.CInt(Std.parseInt(_) => i)):
+                    interval = i;
+                    args.shift();
+
+                default:
+                    null;
+	        }
+	    }
+
+	    var action:Expr = args.shift();
+	    var referencesColor:Bool = false;
+
+	    action.iter(function(e : Expr) {
+	        switch ( e.expr ) {
+                case EConst(CIdent('color')):
+                    referencesColor = true;
+
+                default:
+                    return ;
+	        }
+	    });
+
+        var rce:Array<Expr> = [macro null, macro null];
+        if (referencesColor) {
+            rce[0] = macro var _c = new tannus.graphics.Color();
+            rce[1] = macro _c = new tannus.graphics.Color(data[i],data[i+1],data[i+2],data[i+3]);
+        }
+		action = action.replace(macro red, macro data[i]);
+		action = action.replace(macro green, macro data[i + 1]);
+		action = action.replace(macro blue, macro data[i + 2]);
+		action = action.replace(macro alpha, macro data[i + 3]);
+		if (referencesColor)
+		    action = action.replace(macro color, macro _c);
+
+		return macro {
+		    var i:Int = 0;
+		    var data = $self.imageData.data;
+		    ${rce[0]};
+		    while (i < data.length) {
+		        ${rce[1]};
+		        $action;
+		        i += $v{4 * interval};
+		    }
+		};
+	}
 }
 
 class PixelsTools {
