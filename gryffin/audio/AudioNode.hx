@@ -47,14 +47,16 @@ class AudioNode<T:NNode> {
 	/**
 	  * Disconnect [this] Node from a Node that it is currently connected to
 	  */
-	public function disconnect<T:NNode>(?destination : AudioNode<NNode>):Void {
+	public function disconnect<T:NNode>(?destination:AudioNode<NNode>, ?output:Int, ?input:Int):Void {
 		var n = conode();
-		if (destination != null) {
-			n.disconnect(untyped destination.conode());
-		}
-		else {
-			n.disconnect();
-		}
+		var params:Array<Dynamic> = [];
+		if (destination != null)
+		    params.push(destination.conode());
+		if (output != null)
+		    params.push( output );
+		if (input != null)
+		    params.push( input );
+		Reflect.callMethod(n, n.disconnect, params);
 	}
 
 	/**
