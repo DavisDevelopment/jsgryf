@@ -97,6 +97,23 @@ class Context {
 		return ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
 	}
 
+    /*
+       create and return a new CanvasPattern
+    */
+	public function createPattern(imgSource:Dynamic, repetition:String):CanvasPattern {
+	    var img:Dynamic = imgSource;
+	    if (Std.is(imgSource, gryffin.display.Canvas)) {
+	        img = @:privateAccess cast(imgSource, Canvas).canvas;
+	    }
+        else if (Std.is(imgSource, gryffin.display.Image)) {
+            img = @:privateAccess cast(imgSource, gryffin.display.Image).img;
+        }
+        else if (Std.is(imgSource, gryffin.display.Video)) {
+            img = @:privateAccess cast(imgSource, Video).vid;
+        }
+        return ctx.createPattern(img, repetition);
+	}
+
 
 	public function clearRect(x:Float, y:Float, w:Float, h:Float):Void {
 		ctx.clearRect(x, y, w, h);
