@@ -17,6 +17,7 @@ import tannus.ds.Maybe;
 import tannus.io.ByteArray;
 
 import Std.int;
+import tannus.math.TMath.*;
 
 class CPixels #if !macro implements Paintable #end {
 	/* Constructor Function */
@@ -145,22 +146,81 @@ class CPixels #if !macro implements Paintable #end {
 	  * Write [this] PixelData onto the given Canvas
 	  */
 #if !macro
-	public function write(target:Ctx, x:Float, y:Float, sx:Float=0, sy:Float=0, ?sw:Maybe<Float>, ?sh:Maybe<Float>):Void {
-		target.putImageData(idata, x, y, sx, sy, (sw || width), (sh || height));
+
+    /**
+      * writer [this] ImageData onto [target]
+      */
+	public function write(target:Ctx, x:Float, y:Float, ?sx:Float, ?sy:Float, ?sw:Maybe<Float>, ?sh:Maybe<Float>):Void {
+		if (sx != null && sy != null) {
+		    if (sw != null && sh != null) {
+		        target.putImageData(idata, x, y, sx, sy, sw, sh);
+		    }
+            else {
+		        target.putImageData(idata, x, y, sx, sy);
+            }
+		}
+        else {
+		        target.putImageData(idata, x, y);
+        }
 	}
+
 	public function save():Void {
 		null;
 	}
-#end
 
-	/**
-	  * Save [this] PixelData to the owner-canvas
-	  */
-	/*
-	public function save():Void {
-		write(c, pos.x, pos.y);
+    /**
+      * apply convolution matrix
+      */
+	public function convolute(weights:Array<Int>, opaque:Bool=true):Pixels {
+	    var side = round(sqrt( weights.length ));
+	    var halfSide = floor(side / 2);
+	    var output = createImageData(width, height);
+	    var d = output.data;
+	    var w:Int = width;
+	    var h:Int = height; 
+	    var alphaFac:Int = opaque ? 1 : 0;
+	    var y:Int = 0;
+	    while (y < height) {
+	        var x:Int = 0;
+	        while (x < width) {
+	            var sx:Int = x;
+	            var sy:Int = y;
+	            var dOff:Int = (y*w+x)*4;
+	            var r=0,g=0,b=0,a=0;
+	            var cy:Int = 0;
+	            while (cy < side) {
+	                var cx:Int = 0;
+	                while (cx < side) {
+	                    var scy:Int = sy + cy - halfSide;
+	                    var scx:Int = sx + cx - halfSide;
+	                    if (scy >= 0 && scy < h && scx >= 0 && scx < w) {
+	                        var srcOff:Int = (scy*w+scx)*4;
+                            var wt = weights[cy*side+cx];
+                            r += data[srcOff] * wt;
+                            g += data[srcOff+1] * wt;
+                            b += data[srcOff+2] * wt;
+                            a += data[srcOff+3] * wt;
+	                    }
+
+	                    ++cx;
+	                }
+	                ++cy;
+	            }
+
+                d[dOff] = r;
+                d[dOff + 1] = g;
+                d[dOff + 2] = b;
+                d[dOff + 3] = a + alphaFac*(255-a);
+
+	            ++x;
+	        }
+	        ++y;
+	    }
+
+	    return new Pixels( output );
 	}
-	*/
+
+#end
 
 	/**
 	  * iterate over all Pixels in [this]
@@ -261,13 +321,14 @@ class CPixels #if !macro implements Paintable #end {
 	  */
 	public static inline function imageDataFromByteArray(b : ByteArray):ImageData {
 		return new ImageData(cast b.sub(2, (b.length - 2)).getData(), b[0], b[1]);
-		/*
-		var w:Int = b.readByte();
-		var h:Int = b.readByte();
-		var d:UArray = new UArray(b.read(b.length - b.position).getData());
+	}
 
-		var id = new ImageData(d, w, h);
-		*/
+	private static inline function createImageData(w:Int, h:Int):ImageData {
+	    return new ImageData(w, h);
+	}
+
+	public static inline function create(w:Int, h:Int):Pixels {
+	    return new Pixels(createImageData(w, h));
 	}
 #end
 }

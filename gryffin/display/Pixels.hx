@@ -23,6 +23,27 @@ abstract Pixels (CPixels) from CPixels to CPixels {
 	  */
 	public macro function applyShader(self:ExprOf<Pixels>, args:Array<Expr>) {
 		var action:Expr = args.shift();
+		var interval:ExprOf<Int> = macro 1;
+		if (args.length > 0)
+		    interval = args.shift();
+		var referencesColor:Bool = false;
+		var setsColor:Bool = true;
+        function it(e : Expr) {
+	        switch ( e.expr ) {
+                case EConst(CIdent('color')):
+                    referencesColor = true;
+
+                default:
+                    e.iter( it );
+	        }
+	    }
+	    action.iter( it );
+
+		var rce:Array<Expr> = [macro null, macro null];
+		if ( referencesColor ) {
+            rce[0] = macro var _c = new tannus.graphics.Color();
+            rce[1] = macro _c = new tannus.graphics.Color(data[i],data[i+1],data[i+2],data[i+3]);
+		}
 		
 		action = action.map( PixelsTools.shaderReplacer );
 		action = action.replace(macro red, macro data[i]);
@@ -33,13 +54,15 @@ abstract Pixels (CPixels) from CPixels to CPixels {
 		var block:Expr = macro {
 			var i:Int = 0;
 			var data = $self.imageData.data;
+			${rce[0]};
 			while (i < data.length) {
+			    ${rce[1]};
+
 				$action;
 				
-				i += 4;
+				i += ($interval * 4);
 			}
 		};
-
 		return block;
 	}
 
@@ -101,28 +124,16 @@ class PixelsTools {
 	public static function shaderReplacer(e : Expr):Expr {
 		switch ( e.expr ) {
 			case EConst(CIdent('color')):
-				return macro [red, green, blue];
-				/*
-				return {
-					expr: ENew('tannus.graphics.Color'.toTypePath(), [macro red, macro green, macro blue, macro alpha]),
-					pos: e.pos
-				};
-				*/
+				return macro _c;
 
-			case ExprDef.EBinop(OpAssign, left, right):
-				switch ( left.expr ) {
-					case EConst(CIdent('color')):
-						return (macro {
-							var col = $right;
-							red = col[0];
-							green = col[1];
-							blue = col[2];
-							//alpha = col.alpha;
-						}).map( shaderReplacer );
-
-					default:
-						return e.map( shaderReplacer );
-				}
+            case ExprDef.EBinop(OpAssign, _.expr => EConst(CIdent('color')), right):
+			    return macro {
+                    var _col:tannus.graphics.Color = _c = ${shaderReplacer(right)};
+			        red = _col.red;
+			        green = _col.green;
+			        blue = _col.blue;
+			        _col;
+			    };	
 
 			default:
 				return e.map( shaderReplacer );

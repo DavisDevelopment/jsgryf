@@ -150,4 +150,10 @@ class Canvas implements BitmapSource implements Blobable {
 		can.resize(w, h);
 		return can;
 	}
+
+	public static function fromPixels(pixels : Pixels):Canvas {
+	    var c = create(pixels.width, pixels.height);
+	    c.context.putPixels(pixels, 0, 0);
+	    return c;
+	}
 }
