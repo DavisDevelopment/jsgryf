@@ -45,6 +45,27 @@ class EntityContainer extends Entity implements Container {
 	}
 
 	/**
+	  * 'claim' [child] as a child-entity of [this]
+	  */
+	public function claimChild(child: Entity):Void {
+	    if (!hasChild( child )) {
+	        child.parent = this;
+	        if (stage != null) {
+	            stage.registry[child.id] = child;
+	            child.stage = stage;
+	            child.dispatch('activated', stage);
+	        }
+            else {
+                on('activated', function(s: Stage) {
+                    s.registry[child.id] = child;
+                    child.stage = s;
+                    child.dispatch('activated', s);
+                });
+            }
+	    }
+	}
+
+	/**
 	  * check whether [child] is a child of [this]
 	  */
 	public function hasChild(child : Entity):Bool {
