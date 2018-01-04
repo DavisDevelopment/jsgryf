@@ -156,4 +156,8 @@ class Canvas implements BitmapSource implements Blobable {
 	    c.context.putPixels(pixels, 0, 0);
 	    return c;
 	}
+
+	public static inline function offscreen(w:Int, h:Int):OffscreenCanvas {
+	    return new OffscreenCanvas(w, h);
+	}
 }
