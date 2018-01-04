@@ -316,6 +316,18 @@ class Entity extends EventDispatcher {
 		}
 	}
 
+/* === Computed Instance Fields === */
+
+    @:isVar
+	public var stage(get, set): Stage;
+	private inline function set_stage(v) return (stage = v);
+	private function get_stage() {
+	    if (stage == null && parent != null) {
+	        return (stage = parent.stage);
+	    }
+	    return stage;
+	}
+
 /* === Instance Fields === */
 
 	public var _cached : Bool;
@@ -324,7 +336,6 @@ class Entity extends EventDispatcher {
 	
 	public var destroyed : Bool;
 	public var priority : Int;
-	public var stage : Stage;
 	public var parent(default, set): Null<EntityContainer>;
 	private function set_parent(p : Null<EntityContainer>):Null<EntityContainer> {
 		if (p != null && !Std.is(p, EntityContainer))
