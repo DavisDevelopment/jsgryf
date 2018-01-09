@@ -34,14 +34,14 @@ class EventDispatcher {
 	  * Listen for an Event of the given type
 	  */
 	public function on<T>(name:String, handler:T->Void):Void {
-		sig(name).on( handler );
+		sig( name ).on( handler );
 	}
 
 	/**
 	  * Listen for an Event only once
 	  */
 	public function once<T>(name:String, handler:T->Void):Void {
-		sig(name).once(handler);
+		sig( name ).once( handler );
 	}
 
 	/**
@@ -49,20 +49,6 @@ class EventDispatcher {
 	  */
 	public function when<T>(name:String, test:T->Bool, handler:T->Void):Void {
 		sig(name).when(test, handler);
-	}
-
-	/**
-	  * Listen for an Event, [n] times
-	  */
-	public function times<T>(name:String, count:Int, handler:T->Void):Void {
-		sig(name).times(count, handler);
-	}
-
-	/**
-	  * Listen for an Event, every [interval] times it fires
-	  */
-	public function every<T>(name:String, interval:Int, handler:T->Void):Void {
-		sig(name).every(interval, handler);
 	}
 
 	/**
