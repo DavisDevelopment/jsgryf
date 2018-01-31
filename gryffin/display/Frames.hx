@@ -1,6 +1,6 @@
 package gryffin.display;
 
-import tannus.geom.*;
+import tannus.geom2.*;
 
 class Frames implements Paintable {
 	/* Constructor Function */
@@ -14,7 +14,7 @@ class Frames implements Paintable {
 	/**
 	  * Render [this]
 	  */
-	public function paint(c:Ctx, src:Rectangle, dest:Rectangle):Void {
+	public function paint(c:Ctx, src:Rect<Float>, dest:Rect<Float>):Void {
 		var o = frames[frameIndex];
 		if (o == null) {
 			throw 'Error: Frame cannot be null';
