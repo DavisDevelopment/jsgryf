@@ -2,7 +2,7 @@ package gryffin.display;
 
 import gryffin.display.*;
 
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.graphics.Color;
 import tannus.graphics.Color.Hsl;
 import tannus.io.Ptr;
@@ -10,7 +10,7 @@ import tannus.io.Ptr;
 @:access(gryffin.display.Pixels)
 class Pixel {
 	/* Constructor Function */
-	public function new(s:Pixels, p:Point):Void {
+	public function new(s:Pixels, p:Point<Int>):Void {
 		src = s;
 		pos = p;
 	}
@@ -88,5 +88,5 @@ class Pixel {
 /* === Instance Fields === */
 
 	private var src : Pixels;
-	private var pos : Point;
+	private var pos : Point<Int>;
 }
