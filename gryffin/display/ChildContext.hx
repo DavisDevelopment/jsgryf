@@ -2,7 +2,7 @@ package gryffin.display;
 
 import js.html.*;
 
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.ds.Stack;
 import gryffin.display.Pixels;
 
@@ -14,7 +14,7 @@ using gryffin.display.CtxTools;
 
 class ChildContext extends Context {
 	/* Constructor Function */
-	public function new(ctx:CanvasRenderingContext2D, r:Rectangle):Void {
+	public function new(ctx:CanvasRenderingContext2D, r:Rect<Float>):Void {
 		super( ctx );
 
 		rect = r;
@@ -71,5 +71,5 @@ class ChildContext extends Context {
 /* === Instance Fields === */
 
 	/* the rectangle in which to draw things */
-	public var rect : Rectangle;
+	public var rect : Rect<Float>;
 }
