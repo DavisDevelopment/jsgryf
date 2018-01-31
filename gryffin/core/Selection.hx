@@ -5,7 +5,7 @@ import gryffin.core.*;
 import tannus.io.Getter;
 import tannus.nore.Selector;
 import tannus.ds.Obj;
-import tannus.geom.*;
+import tannus.geom2.*;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -52,7 +52,7 @@ class Selection<T:Entity> {
 	/**
 	  * stuff
 	  */
-	public function containsPoint(p : Point):Selection<T> {
+	public function containsPoint(p : Point<Float>):Selection<T> {
 		var gettr:Getter<Array<T>> = Getter.create(all.macfilter(_.containsPoint(p)));
 		return new Selection(selector, gettr);
 	}
