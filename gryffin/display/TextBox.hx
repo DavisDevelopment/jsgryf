@@ -6,7 +6,7 @@ import gryffin.display.Paintable;
 import gryffin.display.TextAlign;
 import gryffin.display.Context.TextMetrics;
 
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.io.VoidSignal;
 import tannus.graphics.Color;
 
@@ -42,7 +42,7 @@ class TextBox implements Paintable {
 	/**
 	  * Paint [this] TextBox to a Canvas
 	  */
-	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
+	public function paint(c:Ctx, s:Rect<Float>, d:Rect<Float>):Void {
 		if ( cache ) {
 			c.paint(toCanvas(), s, d);
 		}
@@ -58,7 +58,7 @@ class TextBox implements Paintable {
 				}
 
 				applyStyles( c );
-				var p:Point = new Point((d.x + padding), (d.y + padding));
+				var p:Point<Float> = new Point((d.x + padding), (d.y + padding));
 				for (line in lines()) {
 					c.fillText(line.text, p.x, p.y);
 					p.y += line.height;
@@ -204,7 +204,7 @@ class TextBox implements Paintable {
 				}
 
 				applyStyles( canvas.context );
-				var p:Point = new Point(padding, padding);
+				var p:Point<Float> = new Point(padding, padding);
 				for (line in lines()) {
 					c.fillText(line.text, p.x, p.y);
 					p.y += line.height;
