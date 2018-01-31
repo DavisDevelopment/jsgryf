@@ -4,7 +4,7 @@ import gryffin.core.Stage;
 import gryffin.core.EventDispatcher;
 import gryffin.display.*;
 
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.math.Percent;
 import tannus.io.Signal;
 import tannus.io.VoidSignal in VSignal;
@@ -68,7 +68,7 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	/**
 	  * Paint [this] Video onto a Canvas
 	  */
-	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
+	public function paint(c:Ctx, s:Rect<Float>, d:Rect<Float>):Void {
 		if ( ready ) {
 			c.drawImage(vid, s.x, s.y, s.w, s.h, d.x, d.y, d.w, d.h);
 		}
@@ -332,9 +332,9 @@ class Video extends EventDispatcher implements Paintable implements Stateful<Vid
 	private inline function get_naturalHeight():Int return vid.videoHeight;
 
 	/* the rect of [this] Video */
-	public var rect(get, never):Rectangle;
-	private function get_rect():Rectangle {
-		return new Rectangle(0, 0, width, height);
+	public var rect(get, never):Rect<Int>;
+	private function get_rect():Rect<Int> {
+		return new Rect(0, 0, width, height);
 	}
 
 	/* the [src] attribute of [this] Video */
