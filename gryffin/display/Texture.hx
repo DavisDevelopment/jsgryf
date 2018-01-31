@@ -5,7 +5,7 @@ import gryffin.display.Paintable;
 import gryffin.display.Image;
 import gryffin.display.TextureAtlas.TextureBounds in Bounds;
 
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.ds.Ref;
 
 using tannus.math.TMath;
@@ -17,7 +17,7 @@ class Texture implements Paintable {
 	public function new(owner:TextureAtlas, nam:String):Void {
 		atlas = owner;
 		name = nam;
-		matrix = new Matrix();
+		//matrix = new Matrix();
 	}
 
 /* === Instance Methods === */
@@ -25,9 +25,9 @@ class Texture implements Paintable {
 	/**
 	  * draw [this] texture somewhere
 	  */
-	public function paint(c:Ctx, src:Rectangle, d:Rectangle):Void {
+	public function paint(c:Ctx, src:Rect<Float>, d:Rect<Float>):Void {
 		c.save();
-		c.applyMatrix( matrix );
+		//c.applyMatrix( matrix );
 		var s = atlas.sprites[name];
 		c.drawComponent(atlas.sheet, s.x, s.y, s.width, s.height, d.x, d.y, d.w, d.h);
 		c.restore();
@@ -37,5 +37,5 @@ class Texture implements Paintable {
 
 	private var atlas : TextureAtlas;
 	private var name : String;
-	public var matrix : Matrix;
+	//public var matrix : Matrix;
 }

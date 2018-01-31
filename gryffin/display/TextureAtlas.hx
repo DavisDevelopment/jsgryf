@@ -2,7 +2,7 @@ package gryffin.display;
 
 import gryffin.display.*;
 
-import tannus.geom.Rectangle;
+import tannus.geom2.Rect;
 
 class TextureAtlas {
 	/* Constructor Function */
