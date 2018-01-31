@@ -3,7 +3,7 @@ package gryffin.display;
 import gryffin.display.*;
 import gryffin.Tools.defer;
 
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.ds.Ref;
 import tannus.io.Getter;
 import tannus.io.VoidSignal;
@@ -52,7 +52,7 @@ class Image implements BitmapSource {
 		var can:Canvas = Canvas.create(targetWidth, targetHeight);
 		var c = can.context;
 
-		if (complete) {
+		if ( complete ) {
 			can.resize(width, height);
 			c = can.context;
 			c.drawComponent(this, 0, 0, width, height, 0, 0, width, height);
@@ -76,7 +76,7 @@ class Image implements BitmapSource {
 	/**
 	  * Paint [this] Image to a Canvas
 	  */
-	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
+	public function paint(c:Ctx, s:Rect<Float>, d:Rect<Float>):Void {
 		//if ( complete ) {
 		c.drawImage(img, s.x, s.y, s.w, s.h, d.x, d.y, d.w, d.h);
 		/*
@@ -95,14 +95,14 @@ class Image implements BitmapSource {
 	  * Rotate [this] Image
 	  */
 	public function rotate(angle : Angle):Canvas {
-		var r = new Rectangle(0, 0, width, height);
+		var r:Rect<Float> = new Rect(0, 0, width, height).float();
 		var rr = rotatedSize( angle );
 		var can = Canvas.create(floor(rr.w), floor(rr.h));
-		var cr = new Rectangle(0, 0, can.width, can.height);
+		var cr:Rect<Float> = new Rect(0, 0, can.width, can.height).float();
 		var c = can.context;
 		c.save();
 		c.translate(cr.centerX, cr.centerY);
-		c.rotate( angle.radians );
+		c.rotate(angle.getRadians());
 		c.translate(-cr.centerX, -cr.centerY);
 		c.drawImage(img, 0, 0, width, height, 0, 0, cr.w, cr.h);
 		c.restore();
@@ -112,15 +112,15 @@ class Image implements BitmapSource {
 	/**
 	  * Get the size of [this] Image, if rotated by the given Angle
 	  */
-	public function rotatedSize(angle : Angle):Rectangle {
-		var r = angle.radians;
+	public function rotatedSize(angle : Angle):Rect<Float> {
+		var r = angle.getRadians();
 		var a = (width * cos( r ));
 		var b = (height * sin( r ));
 		var rotatedWidth = (a + b);
 		var p = (width * sin(r));
 		var q = (height * cos(r));
 		var rotatedHeight = (p + q);
-		return new Rectangle(0, 0, rotatedWidth, rotatedHeight);
+		return new Rect(0.0, 0.0, rotatedWidth, rotatedHeight);
 	}
 
 	public function getWidth():Int return width;
@@ -146,9 +146,9 @@ class Image implements BitmapSource {
 	private inline function get_height() return img.naturalHeight;
 
 	/* the rectangle of [this] Image */
-	public var rect(get, never):Rectangle;
-	private inline function get_rect():Rectangle {
-		return new Rectangle(0, 0, width, height);
+	public var rect(get, never):Rect<Int>;
+	private inline function get_rect() {
+		return new Rect(0, 0, width, height);
 	}
 
 	/* whether [this] Image is loaded */
