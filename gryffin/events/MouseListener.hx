@@ -7,7 +7,7 @@ import tannus.events.ScrollEvent;
 import tannus.events.EventCreator;
 import tannus.events.EventMod;
 import tannus.html.Win;
-import tannus.geom.Point;
+import tannus.geom2.Point;
 
 import js.html.CanvasElement in Canvas;
 import js.html.MouseEvent in JMEvent;
@@ -103,8 +103,8 @@ class MouseListener implements EventCreator {
 	/**
 	  * Find the coordinates of the given mouse-event, relative to the Canvas
 	  */
-	private inline function findPos(e : JMEvent):Point {
-		return stage.globalToLocal(new Point(e.clientX, e.clientY));
+	private inline function findPos(e : JMEvent):Point<Float> {
+		return stage.globalToLocal(new Point(e.clientX, e.clientY).float());
 	}
 
 	/**
@@ -127,7 +127,7 @@ class MouseListener implements EventCreator {
 	  * Handle an incoming MouseEvent
 	  */
 	private function handle(e : JMEvent):Void {
-		var pos:Point = findPos( e );
+		var pos:Point<Float> = findPos( e );
 		var mods = findMods( e );
 		var event:MouseEvent = new MouseEvent(e.type, pos, e.button, mods);
 		event.onDefaultPrevented.once(untyped e.preventDefault);
@@ -141,7 +141,7 @@ class MouseListener implements EventCreator {
 	private function handleMove():Void {
 		var lastTarget:Null<Entity> = null;
 		function _handle(e : JMEvent):Void {
-			var pos:Point = findPos( e );
+			var pos:Point<Float> = findPos( e );
 			var mods = findMods( e );
 			var event:MouseEvent = new MouseEvent(e.type, pos, e.button, mods);
 			event.onDefaultPrevented.once(untyped e.preventDefault);
