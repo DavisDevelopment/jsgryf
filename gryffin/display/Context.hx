@@ -4,7 +4,7 @@ package gryffin.display;
 import js.html.*;
 #end
 
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.ds.Stack;
 import gryffin.display.Pixels;
 
@@ -28,7 +28,7 @@ class Context {
 	/**
 	  * Paint some object onto [this] Context
 	  */
-	public inline function paint(comp:Paintable, src:Rectangle, dest:Rectangle):Void {
+	public inline function paint(comp:Paintable, src:Rect<Float>, dest:Rect<Float>):Void {
 		comp.paint(ctx, src, dest);
 	}
 
@@ -36,15 +36,17 @@ class Context {
 	  * Draw a Paintable object
 	  */
 	public function drawComponent(comp:Paintable, sx:Float, sy:Float, sw:Float, sh:Float, dx:Float, dy:Float, dw:Float, dh:Float):Void {
-		var src:Rectangle = new Rectangle(sx, sy, sw, sh);
-		var dest:Rectangle = new Rectangle(dx, dy, dw, dh);
-		comp.paint(ctx, src, dest);
+	    inline function rect(x,y,w,h):Rect<Float> return new Rect(x, y, w, h);
+        var src:Rect<Float> = new Rect(sx, sy, sw, sh);
+		var dest:Rect<Float> = new Rect(dx, dy, dw, dh);
+        comp.paint(this, src, dest);
+		//comp.paint(this, rect(sx, sy, sw, sh), rect(dx, dy, dw, dh));
 	}
 
 	/**
 	  * Draw a vertex array
 	  */
-	public inline function drawVertices(vertices : Vertices):Void {
+	public inline function drawVertices(vertices : VertexArray<Float>):Void {
 		ctx.drawVertices( vertices );
 	}
 
@@ -264,7 +266,7 @@ class Context {
 	}
 
 	/* move to the given Point */
-	public inline function moveToPoint(p : Point):Void {
+	public inline function moveToPoint(p : Point<Float>):Void {
 		moveTo(p.x, p.y);
 	}
 
@@ -274,8 +276,13 @@ class Context {
 	}
 
 	/* draw a line to the given Point */
-	public inline function lineToPoint(p : Point):Void {
+	public inline function lineToPoint(p : Point<Float>):Void {
 		lineTo(p.x, p.y);
+	}
+
+	public inline function lineToPoints(ip: Iterable<Point<Float>>):Void {
+	    for (p in ip)
+	        lineToPoint( p );
 	}
 
 
@@ -303,26 +310,27 @@ class Context {
 	/**
 	  * draw a rect from a Rectangle instance
 	  */
-	public inline function drawRect(r : Rectangle):Void {
+	public inline function drawRect(r : Rect<Float>):Void {
 		rect(r.x, r.y, r.w, r.h);
 	}
 
 	/**
 	  * draw a triangle
 	  */
-	public function drawTriangle(t : Triangle):Void {
-		moveToPoint( t.one );
-		lineToPoint( t.two );
-		lineToPoint( t.three );
-		lineToPoint( t.one );
+	public inline function drawTriangle(t:Triangle<Float>, move:Bool=true):Void {
+	    if ( move ) {
+	        moveToPoint( t.a );
+	    }
+	    lineToPoint( t.b );
+	    lineToPoint( t.c );
 	}
 
 	/**
 	  * draw a line from a Line instance
 	  */
-	public inline function drawLine(line : Line):Void {
-		moveToPoint( line.start );
-		lineToPoint( line.end );
+	public inline function drawLine(line:Line<Float>):Void {
+		moveToPoint( line.a );
+		lineToPoint( line.b );
 	}
 
 	/**
@@ -346,12 +354,32 @@ class Context {
 	/**
 	  * draw a rounded Rectangle
 	  */
-	public inline function drawRoundRect(rect:Rectangle, radius:Float):Void {
+	public inline function drawRoundRect(rect:Rect<Float>, radius:Float):Void {
 		roundRect(rect.x, rect.y, rect.w, rect.h, radius);
 	}
 
 	public inline function arc(x:Float, y:Float, radius:Float, startAngle:Float, endAngle:Float, ?anticlockwise:Bool):Void {
 		ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+	}
+
+	public inline function drawArc(a:Arc<Float>):Void {
+	    arc(a.x, a.y, a.radius, a.start_angle.getRadians(), a.end_angle.getRadians(), !a.clockwise);
+	}
+
+	public inline function drawBezier(b:Bezier<Float>, move:Bool=true):Void {
+	    if ( move ) {
+	        moveToPoint( b.start );
+	    }
+
+	    bezierCurveTo(b.ctrl1.x, b.ctrl1.y, b.ctrl2.x, b.ctrl2.y, b.end.x, b.end.y);
+	}
+
+	public inline function drawEllipse(e:Ellipse<Float>):Void {
+	    var b = e.calculateCurves();
+	    drawBezier(b[0], true);
+	    drawBezier(b[1], false);
+	    drawBezier(b[2], false);
+	    drawBezier(b[3], false);
 	}
 
 	/* === Instance Fields === */
