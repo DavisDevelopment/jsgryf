@@ -1,5 +1,6 @@
 package gryffin.core;
-import tannus.geom.*;
+
+import tannus.geom2.*;
 import tannus.internal.TypeTools.typename;
 import tannus.io.Ptr;
 import tannus.ds.Object;
@@ -113,7 +114,7 @@ class Entity extends EventDispatcher {
 	  * Initialize [this] Entity
 	  */
 	public function init(s : Stage):Void {
-		calculateGeometry( s.rect );
+		calculateGeometry(s.rect.float());
 	}
 
 	/**
@@ -162,14 +163,14 @@ class Entity extends EventDispatcher {
 	/**
 	  * Check whether [this] Entity 'contains' the given Point
 	  */
-	public function containsPoint(p : Point):Bool {
+	public function containsPoint(p : Point<Float>):Bool {
 		return false;
 	}
 
 	/**
 	  * Calculate [this] Entity's geometry based on the given Rectangle (usually used to represent the viewport rect)
 	  */
-	public function calculateGeometry(r : Rectangle):Void {
+	public function calculateGeometry(r : Rect<Float>):Void {
 		null;
 	}
 
