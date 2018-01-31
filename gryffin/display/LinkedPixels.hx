@@ -7,19 +7,19 @@ import js.html.Uint8ClampedArray in UArray;
 
 import tannus.graphics.Color;
 import tannus.math.TMath;
-import tannus.geom.Point;
-import tannus.geom.Rectangle;
+import tannus.geom2.Point;
+import tannus.geom2.Rect;
 import tannus.ds.Maybe;
 import tannus.io.ByteArray;
 
 import Std.int;
 
 class LinkedPixels extends CPixels {
-	public function new(owner:Ctx, are:Rectangle, dat:ImageData):Void {
+	public function new(owner:Ctx, are:Rect<Float>, dat:ImageData):Void {
 		super( dat );
 
 		c = owner;
-		area = are;
+		area = are.floor();
 	}
 
 /* === Instance Methods === */
@@ -31,5 +31,5 @@ class LinkedPixels extends CPixels {
 /* === Instance Fields === */
 
 	public var c : Ctx;
-	public var area : Rectangle;
+	public var area : Rect<Int>;
 }
