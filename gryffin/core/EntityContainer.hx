@@ -5,7 +5,7 @@ import gryffin.core.Entity;
 
 import tannus.nore.Selector;
 import tannus.io.Getter;
-import tannus.geom.*;
+import tannus.geom2.*;
 
 using Lambda;
 using tannus.ds.ArrayTools;
@@ -30,14 +30,14 @@ class EntityContainer extends Entity implements Container {
 			if (stage != null) {
 				stage.registry[e.id] = e;
 				e.stage = stage;
-				calculateGeometry( stage.rect );
+				calculateGeometry(stage.rect.float());
 				e.dispatch('activated', stage);
 			}
 			else {
 				on('activated', function(s : Stage) {
 					s.registry[e.id] = e;
 					e.stage = s;
-					calculateGeometry( s.rect );
+					calculateGeometry(s.rect.float());
 					e.dispatch('activated', s);
 				});
 			}
@@ -130,7 +130,7 @@ class EntityContainer extends Entity implements Container {
 	/**
 	  * calculate [this] Entity's geometry
 	  */
-	override public function calculateGeometry(rect : Rectangle):Void {
+	override public function calculateGeometry(rect : Rect<Float>):Void {
 		super.calculateGeometry( rect );
 
 		for (e in getChildren()) {
@@ -141,7 +141,7 @@ class EntityContainer extends Entity implements Container {
 	/**
 	  * get an Array of children of [this] which 'contain' [p]
 	  */
-	public function getEntitiesAtPoint(p : Point):Array<Entity> {
+	public function getEntitiesAtPoint(p : Point<Float>):Array<Entity> {
 		var res:Array<Entity> = new Array();
 		for (e in getChildren()) {
 			if (e.containsPoint( p )) {
@@ -159,7 +159,7 @@ class EntityContainer extends Entity implements Container {
 	/**
 	  * get the priority Entity at the given Point
 	  */
-	public function getEntityAtPoint(p : Point):Null<Entity> {
+	public function getEntityAtPoint(p : Point<Float>):Null<Entity> {
 		var target:Null<Entity> = null;
 		var targets = getChildren().copy();
 		targets.reverse();
