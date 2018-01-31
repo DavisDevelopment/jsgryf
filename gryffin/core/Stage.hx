@@ -5,7 +5,7 @@ import tannus.io.Getter;
 import tannus.ds.Destructible;
 import tannus.ds.Delta;
 import tannus.events.*;
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.html.Win;
 
 import tannus.nore.Selector;
@@ -41,7 +41,7 @@ class Stage extends EventDispatcher implements Container {
 		eventTimes = new Map();
 
 		_fill = false;
-		lastWindowSize = window.viewport;
+		lastWindowSize = window.viewport.clone();
 
 		__init();
 	}
@@ -68,7 +68,7 @@ class Stage extends EventDispatcher implements Container {
 		if (!(width == _w && height == _h)) {
 			var o = new Area(_w, _h);
 			var n = new Area(width, height);
-			var event = new ResizeEvent(o, n);
+			var event = new ResizeEvent(o.float(), o.float());
 			dispatch('resize', event);
 		}
 
@@ -119,7 +119,7 @@ class Stage extends EventDispatcher implements Container {
 	/**
 	  * Get the last known position of the cursor
 	  */
-	public function getMousePosition():Point {
+	public function getMousePosition():Point<Float> {
 		return mouseWatcher.getMousePosition();
 	}
 
@@ -133,7 +133,7 @@ class Stage extends EventDispatcher implements Container {
 	/**
 	  * Get a list of entities that reported themselves to overlap with the given coords
 	  */
-	public function getEntitiesAtPoint(p:Point, ?list:Array<Entity>):Array<Entity> {
+	public function getEntitiesAtPoint(p:Point<Float>, ?list:Array<Entity>):Array<Entity> {
 		/*
 		var res:Array<Entity> = new Array();
 		if (list == null) {
@@ -160,7 +160,7 @@ class Stage extends EventDispatcher implements Container {
 	/**
 	  * Get the 'first' Entity which reported itself to overlap with the given Point
 	  */
-	public function getEntityAtPoint(p : Point):Null<Entity> {
+	public function getEntityAtPoint(p : Point<Float>):Null<Entity> {
 		var start = now;
 		var target:Null<Entity> = null;
 		children.reverse();
@@ -193,6 +193,40 @@ class Stage extends EventDispatcher implements Container {
 	}
 
 	/**
+	  * get a Rect<Float> for the current available viewport
+	  */
+	public function getViewport():Rect<Float> {
+	    if ( _fill ) {
+	        var vvp = window.visualViewport;
+	        if (vvp == null) {
+	            return window.viewport;
+	        }
+            else {
+                var vr:Rect<Int> = vvp.getRect();
+                if (vr.width != 0 && vr.height != 0) {
+                    return vr.float();
+                }
+                else {
+                    return window.viewport;
+                }
+            }
+	    }
+        else {
+            return rect.float();
+
+            @:privateAccess {
+                var cont = canvas.canvas.parentElement;
+                if (cont != null) {
+                    return new Rect(0.0, 0.0, cont.clientWidth, cont.clientHeight);
+                }
+                else {
+                    return new Rect();
+                }
+            };
+        }
+	}
+
+	/**
 	  * Function run each frame
 	  */
 	private function frame(delta : Float):Void {
@@ -202,12 +236,19 @@ class Stage extends EventDispatcher implements Container {
 		   scale the Canvas to fit the Window
 		*/
 		if ( _fill ) {
-			var vp = window.viewport;
-			if (vp != lastWindowSize) {
-				var cw:Int = (Std.int( vp.w ));
-				var ch:Int = (Std.int( vp.h ));
-				resize(cw, ch);
-				lastWindowSize = vp;
+			//var vp:Rect<Float> = window.viewport;
+			//if (vp.nequals( lastWindowSize )) {
+				//trace('$vp');
+				//var cw:Int = (Std.int( vp.w ));
+				//var ch:Int = (Std.int( vp.h ));
+				//resize(cw, ch);
+				//lastWindowSize = vp;
+			//}
+
+			// experimenting with new solution
+			var vp:Rect<Int> = getViewport().int();
+			if (vp.nequals( rect )) {
+			    resize(vp.width, vp.height);
 			}
 		}
 
@@ -256,7 +297,7 @@ class Stage extends EventDispatcher implements Container {
 	  * Calculate geometry
 	  */
 	public function calculateGeometry():Void {
-		var vp = rect;
+		var vp:Rect<Float> = rect.float();
 		for (e in children) {
 			e.calculateGeometry( vp );
 		}
@@ -383,8 +424,8 @@ class Stage extends EventDispatcher implements Container {
 	/**
 	  * get a position relative to [this] Stage, rather than the window
 	  */
-	public function globalToLocal(global : Point):Point {
-	    var pos:Point = global.clone();
+	public function globalToLocal(global : Point<Float>):Point<Float> {
+	    var pos:Point<Float> = global.clone();
 		var crect = canvas.canvas.getBoundingClientRect();
 		
 		pos.x -= crect.left;
@@ -392,8 +433,8 @@ class Stage extends EventDispatcher implements Container {
 		return pos;
 	}
 
-	public function localToGlobal(local : Point):Point {
-	    var pos:Point = local.clone();
+	public function localToGlobal(local : Point<Float>):Point<Float> {
+	    var pos:Point<Float> = local.clone();
 	    var crect = canvas.canvas.getBoundingClientRect();
 	    pos.x += crect.left;
 	    pos.y += crect.top;
@@ -419,12 +460,13 @@ class Stage extends EventDispatcher implements Container {
 	}
 
 	/* the rectangle of [this] Stage */
-	public var rect(get, set):Rectangle;
-	private inline function get_rect():Rectangle {
-		return new Rectangle(0, 0, width, height);
+	public var rect(get, set):Rect<Int>;
+	private inline function get_rect():Rect<Int> {
+		return new Rect(0, 0, width, height);
 	}
-	private inline function set_rect(v : Rectangle):Rectangle {
-		resize(Math.round(v.w), Math.round(v.h));
+	private inline function set_rect(v: Rect<Int>) {
+		//resize(Math.round(v.w), Math.round(v.h));
+		resize(v.width, v.height);
 		return rect;
 	}
 
@@ -461,7 +503,7 @@ class Stage extends EventDispatcher implements Container {
 	private var _fill : Bool;
 
 	/* the last known dimensions of the Window */
-	private var lastWindowSize : Rectangle;
+	private var lastWindowSize : Rect<Float>;
 	private var eventTimes : Map<String, Float>;
 
 /* === Static Fields === */
