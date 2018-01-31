@@ -1,6 +1,6 @@
 package gryffin.display;
 
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.ds.ActionStack.ParametricStack in PStack;
 import tannus.ds.Object;
 import tannus.io.Ptr;
@@ -110,9 +110,9 @@ class CtxTools {
 	/**
 	  * Draw a Vertex-List
 	  */
-	public static function drawVertices(c:Ctx, vertices:Vertices):Void {
-		var points:Array<Point> = vertices;
-		var first:Point = points.shift();
+	public static function drawVertices(c:Ctx, vertices:VertexArray<Float>):Void {
+		var points:Array<Point<Float>> = vertices.toArray();
+		var first:Point<Float> = points.shift();
 		c.moveTo(first.x, first.y);
 		for (p in points) {
 			c.lineTo(p.x, p.y);
@@ -123,25 +123,21 @@ class CtxTools {
 	/**
 	  * Apply the given Matrix to the given Context
 	  */
-	@:allow(gryffin.display.Ctx)
-	private static function applyMatrix(c:Context, m:Matrix):Void {
-		/* if the only non-null transforms are 'tx' and 'ty' */
-		if (m.a == 1 && m.b == 0 && m.c == 0 && m.d == 1) {
-			c.translate(m.tx, m.ty);
-		}
-		/* otherwise */
-		else {
-			c.setTransform(m.a, m.b, m.c, m.d, m.tx, m.ty);
-		}
-	}
+	//@:allow(gryffin.display.Ctx)
+	//private static function applyMatrix(c:Context, m:Matrix):Void {
+		//if (m.a == 1 && m.b == 0 && m.c == 0 && m.d == 1) {
+			//c.translate(m.tx, m.ty);
+		//}
+		//else {
+			//c.setTransform(m.a, m.b, m.c, m.d, m.tx, m.ty);
+		//}
+	//}
 
-	/**
-	  * Get the current Matrix on the given Context
-	  */
-	@:allow(gryffin.display.Ctx)
-	private static function obtainMatrix(c : Context):Matrix {
-		return new Matrix();
-	}
+      //Get the current Matrix on the given Context
+	//@:allow(gryffin.display.Ctx)
+	//private static function obtainMatrix(c : Context):Matrix {
+		//return new Matrix();
+	//}
 
 /* === Utility Methods === */
 
