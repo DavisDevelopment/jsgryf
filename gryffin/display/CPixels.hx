@@ -11,8 +11,8 @@ import js.html.Uint8ClampedArray in UArray;
 
 import tannus.graphics.Color;
 import tannus.math.TMath;
-import tannus.geom.Point;
-import tannus.geom.Rectangle;
+import tannus.geom2.Point;
+import tannus.geom2.Rect;
 import tannus.ds.Maybe;
 import tannus.io.ByteArray;
 
@@ -37,14 +37,14 @@ class CPixels #if !macro implements Paintable #end {
 	/**
 	  * render [this] to a Canvas
 	  */
-	public function paint(c:Ctx, s:Rectangle, d:Rectangle):Void {
+	public function paint(c:Ctx, s:Rect<Float>, d:Rect<Float>):Void {
 		c.putImageData(idata, s.x, s.y, d.x, d.y, d.w, d.h);
 	}
 
 	/**
 	  * Create and return a copy of [this] that is linked to the given Canvas, at a given Point
 	  */
-	public function link(context:Ctx, area:Rectangle):Pixels {
+	public function link(context:Ctx, area:Rect<Float>):Pixels {
 		return new LinkedPixels(context, area, imageData);
 	}
 
@@ -54,14 +54,14 @@ class CPixels #if !macro implements Paintable #end {
 	  * get a Pixel
 	  */
 	public inline function at(x:Float, y:Float):Pixel {
-		return new Pixel(this, new Point(x, y));
+		return new Pixel(this, new Point(x, y).int());
 	}
 
 	/**
 	  * get a Pixel by index
 	  */
 	public inline function ati(index : Int):Pixel {
-		return new Pixel(this, new Point((index % width), (index / width)));
+		return new Pixel(this, new Point(0.0 + (index % width), (index / width)).int());
 	}
 
 	/**
