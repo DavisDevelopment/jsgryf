@@ -1,7 +1,7 @@
 package gryffin.display;
 
 import tannus.ds.Ref;
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.io.ByteArray;
 import tannus.io.Blob;
 import tannus.html.Blobable;

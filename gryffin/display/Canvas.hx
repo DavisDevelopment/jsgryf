@@ -1,7 +1,7 @@
 package gryffin.display;
 
 import tannus.ds.Ref;
-import tannus.geom.*;
+import tannus.geom2.*;
 import tannus.io.ByteArray;
 import tannus.io.Blob;
 import tannus.html.Blobable;
@@ -70,7 +70,7 @@ class Canvas implements BitmapSource implements Blobable {
 	/**
 	  * Paint [this] Canvas onto another
 	  */
-	public function paint(c:Ctx, src:Rectangle, dest:Rectangle):Void {
+	public function paint(c:Ctx, src:Rect<Float>, dest:Rect<Float>):Void {
 		c.drawImage(canvas, src.x, src.y, src.w, src.h, dest.x, dest.y, dest.w, dest.h);
 	}
 	public function getWidth():Int return width;
@@ -132,7 +132,7 @@ class Canvas implements BitmapSource implements Blobable {
 	/* the pixels of [this] Canvas */
 	public var pixels(get, never):Pixels;
 	private function get_pixels():Pixels {
-		return context.getPixels(0, 0, width, height).link(context, new Rectangle(0, 0, width, height));
+		return context.getPixels(0, 0, width, height).link(context, cast new Rect(0, 0, width, height));
 	}
 
 /* === Instance Methods === */
