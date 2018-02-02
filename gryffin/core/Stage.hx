@@ -255,11 +255,20 @@ class Stage extends EventDispatcher implements Container {
 		// cursor = 'default';
 
 		/* remove those Entities which have been marked for deletion */
+		var deleted = children.filterInPlace( child_filterer );
+
+		/* purge deleted items from the registry */
+		for (ent in deleted) {
+		    registry.remove( ent.id );
+		}
+
+		/*
 		var filtr = children.splitfilter(function(e) return !e.destroyed);
 		for (ent in filtr.fail) {
 			registry.remove( ent.id );
 		}
 		children = filtr.pass;
+		*/
 
 		/* sort the Entities by priority */
 		haxe.ds.ArraySort.sort(children, function(a:Entity, b:Entity) {
@@ -274,13 +283,13 @@ class Stage extends EventDispatcher implements Container {
 		/* for every Entity on [this] Stage */
 		for (child in children) {
 			// if it not cached
-			if (!child._cached) {
+			if ( !child._cached ) {
 				// update it
 				child.update( this );
 			}
 
 			// if it is not hidden
-			if (!child._hidden) {
+			if ( !child._hidden ) {
 				// render it
 				child.render(this, ctx);
 			}
@@ -300,6 +309,15 @@ class Stage extends EventDispatcher implements Container {
 		for (e in children) {
 			e.calculateGeometry( vp );
 		}
+	}
+
+	/**
+	/**
+	  * method used to filter out deleted Entities on a Stage
+	  */
+	@:allow( gryffin.core.EntityContainer )
+	private static function child_filterer(child: Entity):Bool {
+	    return child.destroyed;
 	}
 
 	/**
