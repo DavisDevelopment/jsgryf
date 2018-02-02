@@ -312,6 +312,13 @@ class Stage extends EventDispatcher implements Container {
 	}
 
 	/**
+	  * method used to sort Entities on a Stage
+	  */
+	@:allow( gryffin.core.EntityContainer )
+	private static function child_sorter(a:Entity, b:Entity):Int {
+	    return -Reflect.compare(a.priority, b.priority);
+	}
+
 	/**
 	  * method used to filter out deleted Entities on a Stage
 	  */
