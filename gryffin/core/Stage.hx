@@ -271,9 +271,7 @@ class Stage extends EventDispatcher implements Container {
 		*/
 
 		/* sort the Entities by priority */
-		haxe.ds.ArraySort.sort(children, function(a:Entity, b:Entity) {
-			return (a.priority - b.priority);
-		});
+		haxe.ds.ArraySort.sort(children, child_sorter);
 
 		/* clear the Canvas */
 		if ( !noclear ) {
