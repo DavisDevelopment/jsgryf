@@ -236,20 +236,19 @@ class Stage extends EventDispatcher implements Container {
 		   scale the Canvas to fit the Window
 		*/
 		if ( _fill ) {
-			//var vp:Rect<Float> = window.viewport;
-			//if (vp.nequals( lastWindowSize )) {
-				//trace('$vp');
-				//var cw:Int = (Std.int( vp.w ));
-				//var ch:Int = (Std.int( vp.h ));
-				//resize(cw, ch);
-				//lastWindowSize = vp;
-			//}
+            var vp:Rect<Int> = window.viewport.int();
+            if (rect.nequals( vp )) {
+                //resize(vp.x.int(), vp.y.int());
+                rect = vp;
+                trace('betty');
+                lastWindowSize = vp.float();
+            }
 
 			// experimenting with new solution
-			var vp:Rect<Int> = getViewport().int();
-			if (vp.nequals( rect )) {
-			    resize(vp.width, vp.height);
-			}
+			//var vp:Rect<Int> = getViewport().int();
+			//if (vp.nequals( rect )) {
+				//resize(vp.width, vp.height);
+			//}
 		}
 
 		/* reset the cursor to the default (arrow) */
