@@ -128,7 +128,6 @@ class EventDispatcher {
 	  * do fancy meta-binding
 	  */
 	private function __mbind(key:String, handler:Dynamic->Void):Void {
-		var forwardPattern:RegEx = ~/\[([A-Z0-9_]+)\]->(.+)/gi;
 		if (key.has(',')) {
 			var keys = key.split(',').macmap(_.trim());
 			for (k in keys) {
@@ -136,17 +135,7 @@ class EventDispatcher {
 			}
 		}
 		else {
-			if (forwardPattern.match( key )) {
-				var data = forwardPattern.extract( key );
-				var self:Obj = this;
-				defer(function() {
-					var field:EventDispatcher = self[data[1]];
-					field.__mbind(data[2], handler);
-				});
-			}
-			else {
-				on(key, handler);
-			}
+            on(key, handler);
 		}
 	}
 
