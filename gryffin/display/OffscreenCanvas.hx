@@ -16,6 +16,7 @@ import js.Browser.window;
 import js.Browser.document in doc;
 import js.html.Blob in JBlob;
 import js.html.FileReader;
+import js.html.MediaStream;
 
 import Math.*;
 import tannus.math.TMath.*;
@@ -30,7 +31,20 @@ using tannus.html.JSTools;
 
 class OffscreenCanvas extends Canvas {
     /* Constructor Function */
-    public function new(width:Int, height:Int):Void {
-        super(untyped Type.createInstance(window.nativeArrayGet('OffscreenCanvas'), [width, height]));
+    public function new(?c: Dynamic):Void {
+        super( c );
+        if (!(untyped __instanceof__(c, __js__('OffscreenCanvas')))) {
+            throw 'TypeError: [$c] is not an OffscreenCanvas';
+        }
     }
+
+/* === Instance Methods === */
+
+    /**
+      * create a new OffscreenCanvas
+      */
+    override function _makeCanvas():Dynamic {
+        return untyped Type.createInstance((untyped __js__('OffscreenCanvas')), [0, 0]);
+    }
+
 }
