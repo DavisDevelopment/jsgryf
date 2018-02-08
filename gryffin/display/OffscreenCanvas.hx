@@ -47,6 +47,13 @@ class OffscreenCanvas extends Canvas {
         return untyped Type.createInstance((untyped __js__('OffscreenCanvas')), [0, 0]);
     }
 
+    /**
+      * commit [this] OffscreenCanvas to its non-Offscreen counterpart
+      */
+    public inline function commit():Void {
+        (untyped canvas).commit();
+    }
+
 /* === Statics === */
 
     /**
