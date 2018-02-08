@@ -106,14 +106,6 @@ class Canvas implements BitmapSource implements Blobable {
 	public inline function getImage(cb:Image->Void, ?type:String):Void {
 		Image.load(dataURI( type ), cb);
 	}
-	/*
-	public function getImage(callback:Image->Void, ?type:String):Void {
-		toBlob(function(blob : JBlob) {
-			var blobUrl:String = (untyped __js__('(window.URL || window.webkitURL).createObjectURL.bind( window )'))( blob );
-			Image.load(blobUrl, callback);
-		}, type);
-	}
-	*/
 
 /* === Computed Instance Methods === */
 
