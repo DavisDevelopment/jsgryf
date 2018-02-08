@@ -14,6 +14,7 @@ import js.html.CanvasElement in NCanvas;
 import js.Browser.document in doc;
 import js.html.Blob in JBlob;
 import js.html.FileReader;
+import js.html.MediaStream;
 
 import Math.*;
 import tannus.math.TMath.*;
@@ -21,14 +22,23 @@ import tannus.math.TMath.*;
 class Canvas implements BitmapSource implements Blobable {
 	/* Constructor Function */
 	public function new(?c:NCanvas):Void {
-		if (c != null)
+		if (c != null) {
 			canvas = c;
-		else
-			canvas = doc.createCanvasElement();
+        }
+		else {
+			canvas = cast _makeCanvas();
+        }
 		_ctx = Ref.create(new Ctx(canvas.getContext2d()));
 	}
 
 /* === Instance Methods === */
+
+    /**
+      * create a new CanvasElement (or something usably similar)
+      */
+    private function _makeCanvas():Dynamic {
+        return doc.createCanvasElement();
+    }
 
 	/**
 	  * Create and return a perfect clone of [this] Canvas
