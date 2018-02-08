@@ -47,4 +47,12 @@ class OffscreenCanvas extends Canvas {
         return untyped Type.createInstance((untyped __js__('OffscreenCanvas')), [0, 0]);
     }
 
+/* === Statics === */
+
+    /**
+      * create and return a new OffscreenCanvas with the given width and height
+      */
+    public static inline function create(width:Int, height:Int):OffscreenCanvas {
+        return new OffscreenCanvas(untyped __js__('new OffscreenCanvas({0}, {1})', width, height));
+    }
 }
