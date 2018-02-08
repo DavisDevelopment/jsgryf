@@ -93,6 +93,13 @@ class Canvas implements BitmapSource implements Blobable {
 		return canvas.toDataURL( type );
 	}
 
+    /**
+      * capture a video stream from [this] Canvas
+      */
+    public function captureStream(?frameRate: Float):MediaStream {
+        return (untyped canvas).captureStream( frameRate );
+    }
+
 	/**
 	  * Get a Blob from [this] Canvas
 	  */
