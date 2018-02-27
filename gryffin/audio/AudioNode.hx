@@ -24,6 +24,8 @@ import tannus.http.Url;
 
 import js.html.audio.AudioNode in NNode;
 import js.html.audio.AudioContext in NCtx;
+import js.html.audio.ChannelCountMode;
+import js.html.audio.ChannelInterpretation;
 
 using tannus.math.TMath;
 
@@ -72,6 +74,15 @@ class AudioNode<T:NNode> {
 
 	public var numberOfOutputs(get, never):Int;
 	private inline function get_numberOfOutputs():Int return node.numberOfOutputs;
+
+	public var channelCount(get, never): Int;
+	private inline function get_channelCount() return node.channelCount;
+
+	public var channelCountMode(get, never): ChannelCountMode;
+	private inline function get_channelCountMode() return node.channelCountMode;
+
+	public var channelInterpretation(get, never): ChannelInterpretation;
+	private inline function get_channelInterpretation() return node.channelInterpretation;
 
 /* === Instance Fields === */
 
