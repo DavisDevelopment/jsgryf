@@ -15,6 +15,7 @@ import tannus.ds.AsyncPool;
 import tannus.ds.Promise; import tannus.ds.Stateful;
 import tannus.ds.promises.*;
 import tannus.math.Ratio;
+import tannus.async.*;
 
 import tannus.media.*;
 import Math.*;
@@ -32,6 +33,7 @@ class AudioContext {
 	/* Constructor Function */
 	public function new():Void {
 		c = new NCtx();
+
 		destination = new AudioDestination(this, c.destination);
 	}
 
@@ -104,6 +106,10 @@ class AudioContext {
       */
 	public function createShader(?bufferSize:Int, ?inChannels:Int, ?outChannels:Int):AudioShader {
 		return new AudioShader(this, createRawProcessor(bufferSize, inChannels, outChannels));
+	}
+
+	public function createGain():AudioGain {
+	    return new AudioGain( this );
 	}
 
 /* === Computed Instance Fields === */
