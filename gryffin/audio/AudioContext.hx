@@ -41,7 +41,12 @@ class AudioContext {
 	  * dispose of [this] Context, releasing any resources that it has allocated
 	  */
 	public function close(cb : Void->Void):Void {
-		cast((untyped c).close(), js.Promise<Dynamic>).then(untyped cb);
+		//cast((untyped c).close(), js.Promise<Dynamic>).then(untyped cb);
+		((untyped c) : js.Promise<Dynamic>)
+		    .catchError(function(error) {
+		        throw error;
+		    })
+		    .then(untyped cb);
 	}
 
 	/**
