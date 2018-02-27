@@ -108,6 +108,10 @@ class AudioContext {
 		return new AudioShader(this, createRawProcessor(bufferSize, inChannels, outChannels));
 	}
 
+	public function createBiquadFilter():AudioBiquadFilter {
+	    return new AudioBiquadFilter( this );
+	}
+
 	public function createGain():AudioGain {
 	    return new AudioGain( this );
 	}
