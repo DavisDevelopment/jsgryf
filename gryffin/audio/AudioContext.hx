@@ -27,6 +27,7 @@ import tannus.http.Url;
 import js.html.audio.AudioContext in NCtx;
 
 using tannus.math.TMath;
+using tannus.FunctionTools;
 
 @:access( gryffin.audio.Audio )
 class AudioContext {
@@ -43,8 +44,10 @@ class AudioContext {
 	  * dispose of [this] Context, releasing any resources that it has allocated
 	  */
 	public function close(cb : Void->Void):Void {
-		//cast((untyped c).close(), js.Promise<Dynamic>).then(untyped cb);
-		((untyped c) : js.Promise<Dynamic>)
+	    cb = cb.join(function() {
+	        trace('AudioContext closed');
+	    });
+		((untyped c).close() : js.Promise<Dynamic>)
 		    .catchError(function(error) {
 		        throw error;
 		    })
