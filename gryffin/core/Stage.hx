@@ -126,7 +126,7 @@ class Stage extends EventDispatcher implements Container {
 	/**
 	  * Get the time of the most recent occurrence of the given event
 	  */
-	public function mostRecentOccurrenceTime(event : String):Null<Float> {
+	public inline function mostRecentOccurrenceTime(event : String):Null<Float> {
 		return eventTimes.get( event );
 	}
 
@@ -134,25 +134,6 @@ class Stage extends EventDispatcher implements Container {
 	  * Get a list of entities that reported themselves to overlap with the given coords
 	  */
 	public function getEntitiesAtPoint(p:Point<Float>, ?list:Array<Entity>):Array<Entity> {
-		/*
-		var res:Array<Entity> = new Array();
-		if (list == null) {
-			list = children;
-		}
-		for (e in list) {
-			if (e.containsPoint( p )) {
-				res.push( e );
-				
-				if (Std.is(e, EntityContainer)) {
-					var c:EntityContainer = cast e;
-					var cl = cast(e, EntityContainer).getEntitiesAtPoint( p );
-					trace( cl.length );
-					res = res.concat( cl );
-				}
-			}
-		}
-		return res;
-		*/
 		return walk().macfilter(_.containsPoint( p ));
 	}
 	public inline function getEntitiesAt(x:Float, y:Float):Array<Entity> return getEntitiesAtPoint(new Point(x, y));
@@ -179,14 +160,6 @@ class Stage extends EventDispatcher implements Container {
 		children.reverse();
 		var took = (now - start);
 		return target;
-		/*
-		var start = now;
-		var l = getEntitiesAtPoint( p );
-		trace( l );
-		var target = l.macmax( _.priority );
-		var took = (now - start);
-		return target;
-		*/
 	}
 	public function getEntityAt(x:Float, y:Float):Null<Entity> {
 		return getEntityAtPoint(new Point(x, y));
@@ -238,21 +211,10 @@ class Stage extends EventDispatcher implements Container {
 		if ( _fill ) {
             var vp:Rect<Int> = window.viewport.int();
             if (rect.nequals( vp )) {
-                //resize(vp.x.int(), vp.y.int());
                 rect = vp;
-                trace('betty');
                 lastWindowSize = vp.float();
             }
-
-			// experimenting with new solution
-			//var vp:Rect<Int> = getViewport().int();
-			//if (vp.nequals( rect )) {
-				//resize(vp.width, vp.height);
-			//}
 		}
-
-		/* reset the cursor to the default (arrow) */
-		// cursor = 'default';
 
 		/* remove those Entities which have been marked for deletion */
 		var deleted = children.filterInPlace( child_filterer );
@@ -262,16 +224,9 @@ class Stage extends EventDispatcher implements Container {
 		    registry.remove( ent.id );
 		}
 
-		/*
-		var filtr = children.splitfilter(function(e) return !e.destroyed);
-		for (ent in filtr.fail) {
-			registry.remove( ent.id );
-		}
-		children = filtr.pass;
-		*/
-
 		/* sort the Entities by priority */
-		haxe.ds.ArraySort.sort(children, child_sorter);
+		//haxe.ds.ArraySort.sort(children, child_sorter);
+		children.isort( child_sorter );
 
 		/* clear the Canvas */
 		if ( !noclear ) {
@@ -323,6 +278,13 @@ class Stage extends EventDispatcher implements Container {
 	@:allow( gryffin.core.EntityContainer )
 	private static function child_filterer(child: Entity):Bool {
 	    return child.destroyed;
+	}
+
+    /**
+      completely erase [e] from [this] Stage
+     **/
+	public function eraseChild(e: Entity):Void {
+	    registry.remove( e.id );
 	}
 
 	/**
