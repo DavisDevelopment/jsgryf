@@ -44,6 +44,16 @@ class EntityContainer extends Entity implements Container {
 		}
 	}
 
+	public function removeChild(e: Entity):Bool {
+	    if (hasChild( e )) {
+	        children.remove( e );
+	        if (stage != null)
+                stage.eraseChild( e );
+            return true;
+	    }
+        else return false;
+	}
+
 	/**
 	  * 'claim' [child] as a child-entity of [this]
 	  */
@@ -91,20 +101,21 @@ class EntityContainer extends Entity implements Container {
 	/**
 	  * Update [this] Container
 	  */
+	@:access( gryffin.core.Stage )
 	override public function update(s : Stage):Void {
 		super.update( s );
 
 		/* remove those Entities which have been marked for deletion */
-		var filt = children.splitfilter(function(e) return !e.destroyed);
-		for (e in filt.fail) {
+		var dels = children.filterInPlace(c -> c.destroyed);
+		for (e in dels) {
 			stage.registry.remove( e.id );
 		}
-		children = filt.pass;
 
 		/* sort the Entities by priority */
-		haxe.ds.ArraySort.sort(children, function(a:Entity, b:Entity) {
-			return (a.priority - b.priority);
-		});
+		children.isort( Stage.child_sorter );
+		//haxe.ds.ArraySort.sort(children, function(a:Entity, b:Entity) {
+			//return (a.priority - b.priority);
+		//});
 
 		/* update [children] */
 		for (e in getChildren()) {
