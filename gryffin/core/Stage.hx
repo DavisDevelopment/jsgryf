@@ -27,12 +27,14 @@ using tannus.math.TMath;
 @:access( gryffin.display.Canvas )
 class Stage extends EventDispatcher implements Container {
 	/* Constructor Function */
-	public function new(can : NativeCanvas):Void {
+	public function new(can:NativeCanvas, ?options:StageOptions):Void {
 		super();
 
 		canvas = new Canvas( can );
 		children = new Array();
 		registry = new Map();
+		this.options = fillOutOptions( options );
+
 		styles = new GlobalStyles( this );
 		manager = new FrameManager();
 		mouseManager = new MouseListener( this );
@@ -380,6 +382,7 @@ class Stage extends EventDispatcher implements Container {
 	  */
 	private function __init():Void {
 		__events();
+
 		Animations.claim( this );
 	}
 
@@ -387,8 +390,14 @@ class Stage extends EventDispatcher implements Container {
 	  * Initialize all Event Managing Objects
 	  */
 	private function __events():Void {
+	    // frame management
 		manager.frame.on( frame );
 		manager.start();
+
+		// keyboard-input management
+		if ( options.capture_events.keyboard ) {
+		    keyManager.bind();
+		}
 	}
 
 	/**
@@ -423,6 +432,22 @@ class Stage extends EventDispatcher implements Container {
 	    pos.x += crect.left;
 	    pos.y += crect.top;
 	    return pos;
+	}
+
+	private static function fillOutOptions(?o: StageOptions):StageOptions {
+	    if (o == null)
+	        o = {};
+	    if (o.fill == null)
+	        o.fill = false;
+	    if (o.capture_events == null)
+	        o.capture_events = {};
+	    var ce = o.capture_events;
+	    if (ce.keyboard == null)
+	        ce.keyboard = true;
+	    if (ce.mouse == null)
+	        ce.mouse = true;
+
+	    return o;
 	}
 
 /* === Computed Instance Fields === */
@@ -476,6 +501,7 @@ class Stage extends EventDispatcher implements Container {
 	public var children : Array<Entity>;
 	public var registry : Map<String, Entity>;
 	public var noclear : Bool = false;
+	public var options: StageOptions;
 
 	private var manager : FrameManager;
 	private var mouseManager : MouseListener;
@@ -503,3 +529,8 @@ class Stage extends EventDispatcher implements Container {
 	/* the cached Selectors */
 	private static var selectorCache:Map<String, Selector> = {new Map();};
 }
+
+typedef StageOptions = {
+    ?capture_events: {?keyboard:Bool,?mouse:Bool},
+    ?fill: Bool
+};
