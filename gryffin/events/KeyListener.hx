@@ -14,7 +14,7 @@ class KeyListener implements EventCreator {
 	public function new(s : Stage):Void {
 		stage = s;
 
-		listen();
+		//listen();
 	}
 
 /* === Instance Methods === */
@@ -22,12 +22,27 @@ class KeyListener implements EventCreator {
 	/**
 	  * Listen for keyboard events on the Stage
 	  */
-	public function listen():Void {
+	var _ubh:NEvent->Void = null;
+	var events:Array<String> = {['keydown', 'keyup', 'keypress'];};
+	public function bind():Void {
 		var win:Win = Win.current;
-		var events:Array<String> = ['keydown', 'keyup', 'keypress'];
+		//var events:Array<String> = 
+		if (_ubh == null)
+		    _ubh = handle.bind();
+        else return ;
+
 		for (name in events) {
-			win.addEventListener(name, handle);
+			win.addEventListener(name, _ubh);
 		}
+	}
+
+	public function unbind() {
+	    if (_ubh != null) {
+	        for (e in events) {
+	            Win.current.removeEventListener(e, _ubh);
+	        }
+	        _ubh = null;
+	    }
 	}
 
 	/**
