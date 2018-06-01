@@ -28,6 +28,7 @@ import js.html.audio.ChannelCountMode;
 import js.html.audio.ChannelInterpretation;
 
 using tannus.math.TMath;
+using tannus.ds.ArrayTools;
 
 class AudioNode<T:NNode> {
 	/* Constructor Function */
@@ -51,13 +52,13 @@ class AudioNode<T:NNode> {
 	  */
 	public function disconnect<T:NNode>(?destination:AudioNode<NNode>, ?output:Int, ?input:Int):Void {
 		var n = conode();
-		var params:Array<Dynamic> = [];
-		if (destination != null)
-		    params.push(destination.conode());
-		if (output != null)
-		    params.push( output );
-		if (input != null)
-		    params.push( input );
+		var params:Array<Dynamic> = (untyped [destination, output, input]).compact();
+		//if (destination != null)
+			//params.push(destination.conode());
+		//if (output != null)
+			//params.push( output );
+		//if (input != null)
+			//params.push( input );
 		Reflect.callMethod(n, n.disconnect, params);
 	}
 
