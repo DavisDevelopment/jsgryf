@@ -117,9 +117,13 @@ class AudioContext {
 
 	public function createGain():AudioGain {
 	    return new AudioGain( this );
+		//c.sampleRate
 	}
 
 /* === Computed Instance Fields === */
+
+    public var sampleRate(get, never): Float;
+    private inline function get_sampleRate() return c.sampleRate;
 
 /* === Instance Fields === */
 
