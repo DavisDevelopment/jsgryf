@@ -6,6 +6,7 @@ import js.html.*;
 
 import tannus.geom2.*;
 import tannus.ds.Stack;
+import gryffin.display.*;
 import gryffin.display.Pixels;
 
 using gryffin.display.CtxTools;
@@ -136,14 +137,23 @@ class Context {
 		ctx.beginPath();
 	}
 
-
-	public inline function fill():Void {
-		ctx.fill();
+    /**
+      fill the Path
+     **/
+	public function fill(?path: Path2D):Void {
+		if (path != null) {
+            ctx.fill(path);
+		}
+        else
+            ctx.fill();
 	}
 
 
-	public inline function stroke():Void {
-		ctx.stroke();
+	public inline function stroke(?path: Path2D):Void {
+	    if (path != null)
+	        ctx.stroke( path );
+        else
+            ctx.stroke();
 	}
 
 
@@ -157,8 +167,11 @@ class Context {
 	}
 
 
-	public inline function clip():Void {
-		ctx.clip();
+	public inline function clip(?path: Path2D):Void {
+	    if (path != null)
+	        ctx.clip( path );
+        else
+            ctx.clip();
 	}
 
 
