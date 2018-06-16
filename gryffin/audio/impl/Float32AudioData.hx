@@ -90,6 +90,12 @@ class Float32AudioData implements IAudioData<Float> {
 	  */
 	public inline function copyFrom(other:IAudioData<Float>, ?offset:Int, ?start:Int, ?end:Int):Void other.writeTo(this, offset, start, end);
 
+	public static inline function alloc(size: Int):Float32AudioData {
+	    return new Float32AudioData(new Float32Array(size));
+	}
+
+	public inline function getData():Dynamic return d;
+
 /* === Computed Instance Fields === */
 
 	public var length(get, never):Int;

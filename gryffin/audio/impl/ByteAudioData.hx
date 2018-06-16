@@ -15,6 +15,7 @@ using Lambda;
 using tannus.ds.ArrayTools;
 using tannus.math.TMath;
 using tannus.html.JSTools;
+using tannus.FunctionTools;
 
 class ByteAudioData implements IAudioData<Int> {
 	/* Constructor Function */
@@ -84,6 +85,12 @@ class ByteAudioData implements IAudioData<Int> {
 	  * Copy [other]s data onto [this]
 	  */
 	public inline function copyFrom(other:IAudioData<Int>, ?offset:Int, ?start:Int, ?end:Int):Void other.writeTo(this, offset, start, end);
+
+	public static inline function alloc(size: Int):ByteAudioData {
+	    return new ByteAudioData(new Uint8Array( size ));
+	}
+
+	public inline function getData():Dynamic return d;
 
 /* === Computed Instance Fields === */
 
