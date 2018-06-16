@@ -30,6 +30,7 @@ abstract AudioData<T:Float> (IAudioData<T>) from IAudioData<T> to IAudioData<T> 
 	public inline function get(i : Int):T return this.get( i );	
 	@:arrayAccess
 	public inline function set(i:Int, v:T):T return this.set(i, v);
+
 	public inline function clone():AudioData<T> return this.clone();
 	public inline function slice(start:Int, ?end:Int):AudioData<T> return this.slice(start, end);
 	public inline function invert():AudioData<T> return this.invert();
@@ -46,8 +47,26 @@ abstract AudioData<T:Float> (IAudioData<T>) from IAudioData<T> to IAudioData<T> 
 		return new ByteAudioData( l );
 	}
 
+    public static inline function allocByte(size: Int):AudioData<Int> {
+        return ByteAudioData.alloc( size );
+    }
+
+	@:to
+	public static inline function toUint8Array(b: AudioData<Int>):Uint8Array {
+	    return (b.getData() : Uint8Array);
+	}
+
+	@:to
+	public static inline function toFloat32Array(b: AudioData<Float>):Float32Array {
+	    return (b.getData() : Float32Array);
+	}
+
 	@:from
 	public static inline function float(l : Float32Array):AudioData<Float> {
 		return new Float32AudioData( l );
+	}
+
+	public static inline function allocFloat(size: Int):AudioData<Float> {
+	    return Float32AudioData.alloc( size );
 	}
 }
