@@ -34,37 +34,44 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 	/**
 	  * Get the current frequency data, as bytes
 	  */
-	public function getByteFrequencyData():AudioData<Int> {
-		ensureCache();
-		node.getByteFrequencyData( ui8 );
-		return AudioData.byte( ui8 );
+	public inline function getByteFrequencyData(?b: AudioData<Int>):AudioData<Int> {
+	    var a = ensureByte( b );
+		node.getByteFrequencyData( a );
+		return AudioData.byte( a );
 	}
 
 	/**
 	  * Get the current frequency data, as floats
 	  */
-	public function getFloatFrequencyData():AudioData<Float> {
-		ensureCache();
-		node.getFloatFrequencyData( f32 );
-		return AudioData.float( f32 );
+	public inline function getFloatFrequencyData(?b: AudioData<Float>):AudioData<Float> {
+	    var a = ensureFloat( b );
+		node.getFloatFrequencyData( a );
+		return AudioData.float( a );
 	}
 
 	/**
 	  * Get the current waveform data, as bytes
 	  */
-	public function getByteTimeDomainData():AudioData<Int> {
-		ensureCache();
-		node.getByteTimeDomainData( ui8 );
-		return AudioData.byte( ui8 );
+	public inline function getByteTimeDomainData(?b: AudioData<Int>):AudioData<Int> {
+		var a = ensureByte( b );
+		node.getByteTimeDomainData( a );
+		return AudioData.byte( a );
 	}
 
 	/**
 	  * Get the current waveform data, as floats
 	  */
-	public function getFloatTimeDomainData():AudioData<Float> {
-		ensureCache();
-		node.getFloatTimeDomainData( f32 );
-		return AudioData.float( f32 );
+	public inline function getFloatTimeDomainData(?b: AudioData<Float>):AudioData<Float> {
+		var a = ensureFloat( b );
+		node.getFloatTimeDomainData( a );
+		return AudioData.float( a );
+	}
+
+	public inline function createFloatData(size: Int):AudioData<Float> {
+	    return AudioData.allocFloat( size );
+	}
+	public inline function createByteData(size: Int):AudioData<Int> {
+	    return AudioData.allocByte( size );
 	}
 
 	private inline function ensureCache():Void {
@@ -74,6 +81,26 @@ class AudioAnalyser extends AudioNode<AnalyserNode> {
 		if (ui8 == null || ui8.length != frequencyCount) {
 			ui8 = new Uint8Array( frequencyCount );
 		}
+	}
+
+	private inline function ensureFloat(?fl: AudioData<Float>):Float32Array {
+	    if (fl != null && fl.length == frequencyCount) {
+	        return fl.toFloat32Array();
+	    }
+        else {
+            ensureCache();
+            return f32;
+        }
+	}
+
+	private inline function ensureByte(?b: AudioData<Int>):Uint8Array {
+	    if (b != null && b.length == frequencyCount) {
+	        return b.toUint8Array();
+	    }
+        else {
+            ensureCache();
+            return ui8;
+        }
 	}
 
 /* === Computed Instance Fields === */
