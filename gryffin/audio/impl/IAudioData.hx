@@ -18,4 +18,5 @@ interface IAudioData<T> {
 	function writeTo(other:IAudioData<T>, ?destOffset:Int, ?start:Int, ?end:Int):Void;
 	function copyFrom(other:IAudioData<T>, ?offset:Int, ?start:Int, ?end:Int):Void;
 	function getByteArray(?start:Int, ?end:Int):ByteArray;
+	function getData():Dynamic;
 }
