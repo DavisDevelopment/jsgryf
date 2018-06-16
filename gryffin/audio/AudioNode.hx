@@ -52,7 +52,7 @@ class AudioNode<T:NNode> {
 	  */
 	public function disconnect<T:NNode>(?destination:AudioNode<NNode>, ?output:Int, ?input:Int):Void {
 		var n = conode();
-		var params:Array<Dynamic> = (untyped [destination, output, input]).compact();
+		var params:Array<Dynamic> = ((untyped [(destination!=null?destination.node:null), output, input]):Array<Dynamic>).compact();
 		//if (destination != null)
 			//params.push(destination.conode());
 		//if (output != null)
