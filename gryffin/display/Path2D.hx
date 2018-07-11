@@ -47,9 +47,40 @@ abstract Path2D (NPath) from NPath to NPath {
         return this;
     }
 
-    public inline function addRect(rect: Rect<Float>):Path2D {
-        this.rect(rect.x, rect.y, rect.width, rect.height);
+    public function addRect(rect:Rect<Float>, ?radius:Float):Path2D {
+        if (radius == null || radius == 0) {
+            this.rect(rect.x, rect.y, rect.width, rect.height);
+            return this;
+        }
+        else {
+            return addRoundRect(rect, radius);
+        }
+    }
+
+    public inline function roundRect(x:Float, y:Float, w:Float, h:Float, r:Float):Path2D {
+		this.moveTo(x + r, y);
+		this.lineTo(x + w - r, y);
+		this.quadraticCurveTo(x + w, y, x + w, y + r);
+
+		this.lineTo(x + w, y + h - r);
+		this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+
+		this.lineTo(x + r, y + h);
+		this.quadraticCurveTo(x, y + h, x, y + h - r);
+
+		this.lineTo(x, y + r);
+		this.quadraticCurveTo(x, y, x + r, y);
+	    
+	    return this;
+    }
+
+    public inline function quadraticCurveToPoint(ctrl:Point<Float>, dest:Point<Float>):Path2D {
+        this.quadraticCurveTo(ctrl.x, ctrl.y, dest.x, dest.y);
         return this;
+    }
+
+    public inline function addRoundRect(rect:Rect<Float>, radius:Float):Path2D {
+        return roundRect(rect.x, rect.y, rect.w, rect.h, radius);
     }
 
     public inline function moveToPoint(p: Point<Float>):Path2D {
