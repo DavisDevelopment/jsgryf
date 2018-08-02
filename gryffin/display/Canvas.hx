@@ -1,6 +1,7 @@
 package gryffin.display;
 
 import tannus.ds.Ref;
+import tannus.ds.Lazy;
 import tannus.geom2.*;
 import tannus.io.ByteArray;
 import tannus.io.Blob;
@@ -28,7 +29,10 @@ class Canvas implements BitmapSource implements Blobable {
 		else {
 			canvas = cast _makeCanvas();
         }
-		_ctx = Ref.create(new Ctx(canvas.getContext2d()));
+        _ctx = Lazy.ofFunc(function() {
+            return new Ctx(canvas.getContext2d());
+        });
+		//_ctx = Ref.create(new Ctx(canvas.getContext2d()));
 	}
 
 /* === Instance Methods === */
@@ -54,7 +58,10 @@ class Canvas implements BitmapSource implements Blobable {
 	public function resize(w:Int, h:Int):Void {
 		canvas.width = w;
 		canvas.height = h;
-		_ctx = Ref.create(new Ctx(canvas.getContext2d()));
+		//_ctx = Ref.create(new Ctx(canvas.getContext2d()));
+        _ctx = Lazy.ofFunc(function() {
+            return new Ctx(canvas.getContext2d());
+        });
 	}
 
 	/**
@@ -147,7 +154,7 @@ class Canvas implements BitmapSource implements Blobable {
 /* === Instance Methods === */
 
 	private var canvas : NCanvas;
-	private var _ctx : Ref<Ctx>;
+	private var _ctx : Lazy<Ctx>;
 
 /* === Static Methods === */
 
