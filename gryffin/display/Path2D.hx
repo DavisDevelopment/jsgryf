@@ -19,6 +19,8 @@ using tannus.ds.StringUtils;
 using tannus.FunctionTools;
 using gryffin.display.CtxTools;
 
+
+
 @:forward
 abstract Path2D (NPath) from NPath to NPath {
     /* Constructor Function */
@@ -106,3 +108,74 @@ abstract Path2D (NPath) from NPath to NPath {
 }
 
 typedef Path2DInit = Either<NPath, String>;
+
+class Path2DBase {
+    /* Constructor Function */
+    public function new() {
+        segments = new Array();
+        currentPoint = null;
+        closePoint = null;
+        _simple = true;
+    }
+
+/* === Instance Methods === */
+
+    function push(seg:Path2DSegment, ?curp:Point<Float>, ?endp:Point<Float>, ?simple:Bool) {
+        segments.push( seg );
+        if (curp != null)
+            currentPoint = curp.clone();
+
+        if (endp != null)
+            closePoint = endp.clone();
+
+        if (simple != null)
+            _simple = simple;
+        return this;
+    }
+
+    public function moveTo(x:Float, y:Float) {
+        push(Move(x, y), new Point(x, y));
+    }
+
+    public function lineTo(x:Float, y:Float) {
+        push(Line(x, y), new Point(x, y));
+    }
+
+    public function bezierCurveTo(cp1x:Float, cp1y:Float, cp2x:Float, cp2y:Float, x:Float, y:Float) {
+        push(Curve(cp1x, cp1y, cp2x, cp2y, x, y), new Point(x, y));
+    }
+
+    public function closePath() {
+        //push(Close, )
+    }
+
+/* === Instance Fields === */
+
+    var segments: Array<Path2DSegment>;
+    var currentPoint: Null<Point<Float>> = null;
+    var closePoint: Null<Point<Float>> = null;
+    var _simple: Bool = true;
+}
+
+interface Path2DObject {
+    function arc(x:Float, y:Float, radius:Float, startAngle:Float, endAngle:Float, ?antiClockwise:Bool):Void;
+    function arcTo(x1:Float, y1:Float, x2:Float, y2:Float, radius:Float):Void;
+    function bezierCurveTo(cp1x:Float, cp1y:Float, cp2x:Float, cp2y:Float, x:Float, y:Float):Void;
+    function closePath():Void;
+    function ellipse(x:Float, y:Float, radiusX:Float, radiusY:Float, rotation:Float, startAngle:Float, endAngle:Float, ?anticlockwise:Bool):Void;
+    function lineTo(x:Float, y:Float):Void;
+    function moveTo(x:Float, y:Float):Void;
+    function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Void;
+    function rect(x:Float, y:Float, w:Float, h:Float):Void;
+}
+
+enum Path2DSegment {
+    Close();
+    Move(x:Float, y:Float);
+    Line(x:Float, y:Float);
+    Curve(cp1x:Float, cp1y:Float, cp2x:Float, cp2y:Float, x:Float, y:Float);
+    Arc(rx:Float, ry:Float, fromAngle:Float, extent:Float);
+
+    Ellipse(x:Float, y:Float, radiusX:Float, radiusY:Float, rotation:Float, startAngle:Float, endAngle:Float, anticlockwise:Bool);
+    Rect(x:Float, y:Float, w:Float, h:Float);
+}
