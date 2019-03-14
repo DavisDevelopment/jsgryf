@@ -11,6 +11,7 @@ import gryffin.display.Pixels;
 
 using gryffin.display.CtxTools;
 
+#if !macro
 class Context {
 	/* Constructor Function */
 	public function new(ctx : CanvasRenderingContext2D):Void {
@@ -48,7 +49,13 @@ class Context {
 	  * Draw a vertex array
 	  */
 	public inline function drawVertices(vertices : VertexArray<Float>):Void {
-		ctx.drawVertices( vertices );
+        var points:Array<Point<Float>> = vertices.toArray();
+		var first:Point<Float> = points.shift();
+		ctx.moveTo(first.x, first.y);
+		for (p in points) {
+			ctx.lineTo(p.x, p.y);
+		}
+		ctx.lineTo(first.x, first.y);
 	}
 
 	public inline function save():Void {
@@ -501,6 +508,7 @@ class Context {
 	/* the underlying CanvasRenderingContext2D object */
 	private var ctx : CanvasRenderingContext2D;
 }
+#end
 
 typedef TextMetrics = {
 	var width : Float;
